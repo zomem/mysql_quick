@@ -1,0 +1,16 @@
+[package]
+name = "mysql_quick"
+version = "0.1.0"
+edition = "2021"
+authors = ["zomem"]
+description = "mysql 数据库快速连接方法"
+license = "MIT"
+readme = "README.md"
+include = ["/src"]
+repository = "https://github.com/zomem/mysql_quick"
+keywords = ["mysql", "sql"]
+categories = ["database"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
