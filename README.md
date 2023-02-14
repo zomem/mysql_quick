@@ -1,7 +1,16 @@
 
 
-### 数据库连接
+### mysql 数据库连接方法封装  
   
+|  方法   | 说明  |
+|  ----  | ----  |
+| count  | 返回计数 |
+| del  | 删除一条数据 |
+| find  | 查寻数据 |
+| get  | 查寻一条数据 |
+| set  | 新增一条数据 |
+| setmany  | 批量新增数据 |
+| update  | 更新一条数据 |
 
 依赖：
 ```toml
@@ -10,9 +19,6 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 regex = "1.7"
 ```
-  
-目前仅支持 mysql
-
 
 ### mysql 查寻示例  
 run、run_drop  
