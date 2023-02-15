@@ -1,6 +1,6 @@
 
 
-/// 查寻方法，返回sql
+/// 查寻数据，返回sql
 /// 
 /// 完整参数如下，注意，参数可以省略，但顺序固定。select 必传且不能为*。 
 /// ```
@@ -15,11 +15,11 @@
 /// ```
 /// 
 /// // 重命名用 as 操作
-/// find!("feedback as fb", {
+/// myfind!("feedback as fb", {
 ///     j0: ["uid", "inner", "users.id"],
 ///     j1: ["uid", "inner", "users as u2.id"], // 对表重命名
 ///     j2: ["book_id", "left", "book.id"],
-///     j3: ["book_id", "right", "book.id"],
+///     j3: ["book.uid", "right", "users.id"],
 ///     p0: ["num", ">", 0],
 ///     p1: ["d", "=", "这是的"],
 ///     p2: ["users.user_niae", "like", "%aa%"],
@@ -47,14 +47,14 @@
 ///     created_at: String,
 /// }
 /// let data: (Vec<Feedback>, Option<(u64,u64,String,String)>) = 
-///     run(find!("feedback", {
+///     run(&mut conn, myfind!("feedback", {
 ///         p0: ["uid", ">", 0],
 ///         r: "p0",
 ///         select: "id,uid,content,created_at",
 ///     })).unwrap();
 /// ```
 #[macro_export]
-macro_rules! find {
+macro_rules! myfind {
     ($t:expr, {
         $(j0: [$jk0:tt, $jm0:tt, $jv0:expr],)?
         $(j1: [$jk1:tt, $jm1:tt, $jv1:expr],)?

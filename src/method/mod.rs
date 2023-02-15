@@ -1,25 +1,25 @@
 
 
 #[macro_use]
-mod count;
+mod mycount;
 
 #[macro_use]
-mod del;
+mod mydel;
 
 #[macro_use]
-mod find;
+mod myfind;
 
 #[macro_use]
-mod get;
+mod myget;
 
 #[macro_use]
-mod set;
+mod myset;
 
 #[macro_use]
-mod setmany;
+mod mysetmany;
 
 #[macro_use]
-mod update;
+mod myupdate;
 
 
 mod method;

@@ -3,18 +3,18 @@
 /// 计数 ，返回 sql 语句，参数同 find 类似。
 /// Count, get back sql, the params same as find.
 /// ```
-/// let res_count: (Vec<u64>, Option<u64>) = run(count!("feedback", {})).unwrap();
+/// let res_count: (Vec<u64>, Option<u64>) = run(&mut conn, mycount!("feedback", {})).unwrap();
 /// println!("Count 结果： {:#?}", res_count.0[0]);
 /// 
 /// 
 /// // 条件计数
-/// count!(table, {
+/// mycount!(table, {
 ///     p0: ["price", ">", 100],
 ///     r: "p0"
 /// });
 /// ```
 #[macro_export]
-macro_rules! count {
+macro_rules! mycount {
     ($t:expr, {
         $(j0: [$jk0:tt, $jm0:tt, $jv0:expr],)?
         $(j1: [$jk1:tt, $jm1:tt, $jv1:expr],)?

@@ -5,24 +5,24 @@
 /// ```
 /// 根据 id 查寻
 /// // 查寻 id =3 3 的数据
-/// let sql1 = get!("feedback", 33, "id,content as cc");
+/// let sql1 = myget!("feedback", 33, "id,content as cc");
 /// #[derive(Serialize, Deserialize, Debug)]
 /// struct Feedback {
 ///     id: u64,
 ///     cc: String
 /// }
-/// let res_get: (Vec<Feedback>, Option<(u64, String)>) = run(sql1).unwrap();
+/// let res_get: (Vec<Feedback>, Option<(u64, String)>) = run(&mut conn, sql1).unwrap();
 /// println!("结果》》 ： {:#?}", res_get);
 /// 
 /// 
 /// 根据指定字段查寻
 /// // 查寻 uid = 32 的数据
-/// get!("table", {"uid": 32}, "id, nickname, age")
+/// myget!("table", {"uid": 32}, "id, nickname, age")
 /// 
 /// ```
 /// 
 #[macro_export]
-macro_rules! get {
+macro_rules! myget {
     ($t:expr, {$k:tt: $v:expr} $(,$select:expr)?$(,)?) => {
         {
             fn _type_of<T>(_: T) -> &'static str {

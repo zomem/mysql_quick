@@ -4,13 +4,13 @@
   
 |  方法   | 说明  |
 |  ----  | ----  |
-| count  | 返回计数 |
-| del  | 删除一条数据 |
-| find  | 查寻数据 |
-| get  | 查寻一条数据 |
-| set  | 新增一条数据 |
-| setmany  | 批量新增数据 |
-| update  | 更新一条数据 |
+| mycount  | 返回计数 |
+| mydel  | 删除一条数据 |
+| myfind  | 查寻数据 |
+| myget  | 查寻一条数据 |
+| myset  | 新增一条数据 |
+| mysetmany  | 批量新增数据 |
+| myupdate  | 更新一条数据 |
 
 依赖：
 ```toml
@@ -31,21 +31,21 @@ pub fn mysql_conn() -> PooledConn {
 let mut conn = mysql_conn();
 
 // 新增一条数据
-let id = run_drop(&mut conn, set!("feedback", {
+let id = run_drop(&mut conn, myset!("for_test", {
     "content": "ADFaadf",
     "uid": 9,
 })).unwrap();
 
 // 删除一条数据
-run_drop(&mut conn, del!("feedback", 50)).unwrap();
+run_drop(&mut conn, mydel!("for_test", 50)).unwrap();
 
 // 更新一条数据
-run_drop(&mut conn, update!("feedback", 56, {
+run_drop(&mut conn, myupdate!("for_test", 56, {
     "content": "更新后的内容，一一一一"
 })).unwrap();
 
 // 批量 新增数据
-let msql = setmany!("feedback", [
+let msql = mysetmany!("for_test", [
     {"uid": 1, "content": "批量更新00adf"},
     {"uid": 2, "content": "2342341"},
     {"uid": 3, "content": "mmmmm"},
@@ -56,7 +56,7 @@ let msql = setmany!("feedback", [
 run_drop(&mut conn, msql).unwrap();
 
 // 获取一条数据
-let sql1 = get!("feedback", 33, "id as id, feedback.content as cc");
+let sql1 = myget!("for_test", 33, "id as id, feedback.content as cc");
 #[derive(Serialize, Deserialize, Debug)]
 struct Feedback {
     id: u64,
@@ -65,7 +65,7 @@ struct Feedback {
 let res_get: (Vec<Feedback>, Option<(u64, String)>) = run(&mut conn, sql1).unwrap();
 
 // 查寻数据
-let sql_f = find!("feedback", {
+let sql_f = myfind!("for_test", {
     p0: ["uid", ">", 330],
     r: "p0",
     select: "id, content as cc",
@@ -73,7 +73,7 @@ let sql_f = find!("feedback", {
 let res_find: (Vec<Feedback>, Option<(u64, String)>) = run(&mut conn, sql_f).unwrap();
 
 // 获取计数
-let res_count: (Vec<u64>, Option<u64>) = run(&mut conn, count!("feedback", {})).unwrap();
+let res_count: (Vec<u64>, Option<u64>) = run(&mut conn, mycount!("for_test", {})).unwrap();
 
 
 ```
@@ -86,22 +86,18 @@ use mysql_quick::{TxOpts, MY_EXCLUSIVE_LOCK, MY_SHARED_LOCK};
 
 let mut conn = mysql_conn();
 // ---- 事务开始 ----
-let mut tran = conn.start_transaction(TxOpts::default()).unwrap();
-let getsql = get!("feedback", 59, "id,num,content,created_at") + MY_EXCLUSIVE_LOCK;  // 加锁操作，
-let get_data: (Vec<SomeThing>, Option<(u64,u64,String,String)>) = run_tran(&mut tran, getsql).unwrap();
-
+ let mut tran = conn.start_transaction(TxOpts::default()).unwrap();
+let getsql = myget!("for_test", 5, "id,title,content,price,total,uid") + MY_EXCLUSIVE_LOCK;
+let get_data: (Vec<ForTestItem>, Option<(u32,String,String,f32,i32,u16)>) = my_run_tran(&mut tran, getsql).unwrap();
 let tmp = get_data.0;
 if tmp.len() == 0 {
-    // 回滚事务
     tran.rollback().unwrap();
 } else {
-    if tmp[0].num <= 0 {
-        // 回滚事务
+    if tmp[0].total <= 0 {
         tran.rollback().unwrap();
     } else {
-        let sql2 = update!("feedback", 59, {"num": ["incr", -1]});
-        run_tran_drop(&mut tran, sql2).unwrap();
-        // 提交事务
+        let sql2 = myupdate!("for_test", 5, {"total": ["incr", -1]});
+        my_run_tran_drop(&mut tran, sql2).unwrap();
         tran.commit().unwrap();
     }
 }

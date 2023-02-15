@@ -74,10 +74,10 @@ impl MysqlQuick {
 
 
 /// 运行sql语句，返回最近一条语句的数据id，如果上没有，则返回0，用于set返回对应的id。
-/// 其他方法del、setmany、update，则不用管这个id。
-/// ### 用于：set、del、setmany、update
+/// 其他方法mydel、mysetmany、myupdate，则不用管这个id。
+/// ### 用于：myset、mydel、mysetmany、myupdate
 /// ```
-/// let id = run_drop(&mut conn, set!("feedback", {
+/// let id = my_run_drop(&mut conn, myset!("feedback", {
 ///    "content": "ADFaadf",
 ///    "uid": 9,
 /// })).unwrap();
@@ -85,7 +85,7 @@ impl MysqlQuick {
 /// ```
 /// 
 /// 
-pub fn run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
+pub fn my_run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
     let temp_res = conn.query_drop(sql);
     match temp_res {
         Ok(_) => Ok(conn.last_insert_id()),
@@ -94,21 +94,21 @@ pub fn run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
 }
 
 /// 运行sql语句，返回想要的结果
-/// ### 用于：get、find、count
+/// ### 用于：myget、myfind、mycount
 /// ### 示例
 /// ```
-/// let sql1 = get!("feedback", 33, "id as id, feedback.content as cc");
+/// let sql1 = myget!("feedback", 33, "id as id, feedback.content as cc");
 /// #[derive(Serialize, Deserialize, Debug)]
 /// struct Feedback {
 ///     id: u64,
 ///     cc: String
 /// }
-/// let res_get: (Vec<Feedback>, Option<(u64, String)>) = run(&mut conn, sql1).unwrap();
+/// let res_get: (Vec<Feedback>, Option<(u64, String)>) = my_run(&mut conn, sql1).unwrap();
 /// println!("get 结果 {:#?}", res_get);
 /// ```
 /// 
 /// 
-pub fn run<T, U>(conn: &mut PooledConn, sql: String) -> Result<(Vec<U>, Option<T>)>
+pub fn my_run<T, U>(conn: &mut PooledConn, sql: String) -> Result<(Vec<U>, Option<T>)>
 where
     T: FromRow + Serialize + Clone + Debug,
     U: DeserializeOwned
@@ -131,23 +131,23 @@ where
 
 /// ### 事务执行
 /// 运行sql语句，返回上一条语句的id，如果上没有，则返回0
-/// ### 用于：set、update、del、setmany
+/// ### 用于：myset、myupdate、mydel、mysetmany
 /// ### 示例
 /// ```
-/// let id = run_tran_drop(&mut tran, set!("feedback", {
+/// let id = my_run_tran_drop(&mut tran, myset!("feedback", {
 ///    "content": "ADFaadf",
 ///     "uid": 9,
 /// })).unwrap();
 /// 
-/// run_tran_drop(&mut tran, del!("feedback", 50)).unwrap();
+/// my_run_tran_drop(&mut tran, mydel!("feedback", 50)).unwrap();
 /// 
-/// run_tran_drop(&mut tran, update!("feedback", 56, {
+/// my_run_tran_drop(&mut tran, myupdate!("feedback", 56, {
 ///     "content": "更新后的内容，一一一一"
 /// })).unwrap();
 /// ```
 /// 
 /// 
-pub fn run_tran_drop(tran: &mut Transaction, sql: String) -> Result<u64> {
+pub fn my_run_tran_drop(tran: &mut Transaction, sql: String) -> Result<u64> {
     let temp_tran = tran.query_drop(sql);
     match temp_tran {
         Ok(_) => {
@@ -160,21 +160,21 @@ pub fn run_tran_drop(tran: &mut Transaction, sql: String) -> Result<u64> {
 }
 /// ### 事务执行
 /// 运行sql语句
-/// ### 用于：get、find、count
+/// ### 用于：myget、myfind、mycount
 /// ### 示例
 /// ```
-/// let sql1 = get!("feedback", 33, "id as id, feedback.content as cc");
+/// let sql1 = myget!("feedback", 33, "id as id, feedback.content as cc");
 /// #[derive(Serialize, Deserialize, Debug)]
 /// struct Feedback {
 ///     id: u64,
 ///     cc: String
 /// }
-/// let res_get: (Vec<Feedback>, Option<(u64, String)>) = run_tran(&mut tran, sql1).unwrap();
+/// let res_get: (Vec<Feedback>, Option<(u64, String)>) = my_run_tran(&mut tran, sql1).unwrap();
 /// println!("get 结果 {:#?}", res_get);
 /// ```
 /// 
 /// 
-pub fn run_tran<T, U>(tran: &mut Transaction, sql: String) -> Result<(Vec<U>, Option<T>)>
+pub fn my_run_tran<T, U>(tran: &mut Transaction, sql: String) -> Result<(Vec<U>, Option<T>)>
 where
     T: FromRow + Serialize + Clone + Debug,
     U: DeserializeOwned
