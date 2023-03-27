@@ -267,9 +267,9 @@ fn as_string(row: Row, index: usize) -> Option<String> {
         Value::Float(v) => format!("{v}"),
         Value::Double(v) => format!("{v}"),
         Value::Date(year, month, day, hour, minutes, seconds, micro) 
-            => format!("{year}-{month}-{day} {hour}:{minutes}:{seconds}.{micro}"),
+            => format!("\"{year}-{month}-{day} {hour}:{minutes}:{seconds}\""),
         Value::Time(negative, days, hours, minutes, seconds, micro) 
-            => format!("{negative} {days} {hours}:{minutes}:{seconds}.{micro}"),
+            => format!("\"{negative} {days} {hours}:{minutes}:{seconds}.{micro}\""),
     })
 }
 
