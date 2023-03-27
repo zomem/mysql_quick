@@ -8,7 +8,7 @@
 ///     "uid": 77,
 /// })  // id = 50
 /// 
-/// run(&mut sql).unwrap();
+/// my_run_drop(&mut sql).unwrap();
 /// 
 /// // 原子更新，
 /// let sql2 = myupdate!("feedback", 50, {
@@ -25,7 +25,7 @@
 /// // uid = 12
 /// let sql = myupdate!("feedback", {"uid": 12}, {"name": "zh"});
 /// 
-/// run(&mut sql).unwrap();
+/// my_run_drop(&mut sql).unwrap();
 /// 
 /// ```
 #[macro_export]

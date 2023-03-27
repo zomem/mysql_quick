@@ -47,7 +47,7 @@
 ///     created_at: String,
 /// }
 /// let data: (Vec<Feedback>, Option<(u64,u64,String,String)>) = 
-///     run(&mut conn, myfind!("feedback", {
+///     my_run(&mut conn, myfind!("feedback", {
 ///         p0: ["uid", ">", 0],
 ///         r: "p0",
 ///         select: "id,uid,content,created_at",

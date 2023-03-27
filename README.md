@@ -31,16 +31,16 @@ pub fn mysql_conn() -> PooledConn {
 let mut conn = mysql_conn();
 
 // 新增一条数据
-let id = run_drop(&mut conn, myset!("for_test", {
+let id = my_run_drop(&mut conn, myset!("for_test", {
     "content": "ADFaadf",
     "uid": 9,
 })).unwrap();
 
 // 删除一条数据
-run_drop(&mut conn, mydel!("for_test", 50)).unwrap();
+my_run_drop(&mut conn, mydel!("for_test", 50)).unwrap();
 
 // 更新一条数据
-run_drop(&mut conn, myupdate!("for_test", 56, {
+my_run_drop(&mut conn, myupdate!("for_test", 56, {
     "content": "更新后的内容，一一一一"
 })).unwrap();
 
@@ -53,7 +53,7 @@ let msql = mysetmany!("for_test", [
     {"uid": 5, "content": "奔苦asda工工"},
     {"uid": 6, "content": "555"}
 ]);
-run_drop(&mut conn, msql).unwrap();
+my_run_drop(&mut conn, msql).unwrap();
 
 // 获取一条数据
 let sql1 = myget!("for_test", 33, "id as id, feedback.content as cc");
@@ -62,7 +62,7 @@ struct Feedback {
     id: u64,
     cc: String
 }
-let res_get: (Vec<Feedback>, Option<(u64, String)>) = run(&mut conn, sql1).unwrap();
+let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql1).unwrap();
 
 // 查寻数据
 let sql_f = myfind!("for_test", {
@@ -70,10 +70,10 @@ let sql_f = myfind!("for_test", {
     r: "p0",
     select: "id, content as cc",
 });
-let res_find: (Vec<Feedback>, Option<(u64, String)>) = run(&mut conn, sql_f).unwrap();
+let res_find: Vec<Feedback> = my_run_vec(&mut conn, sql_f).unwrap();
 
 // 获取计数
-let res_count: (Vec<u64>, Option<u64>) = run(&mut conn, mycount!("for_test", {})).unwrap();
+let res_count: Vec<u64> = my_run_vec(&mut conn, mycount!("for_test", {})).unwrap();
 
 
 ```
@@ -88,7 +88,7 @@ let mut conn = mysql_conn();
 // ---- 事务开始 ----
  let mut tran = conn.start_transaction(TxOpts::default()).unwrap();
 let getsql = myget!("for_test", 5, "id,title,content,price,total,uid") + MY_EXCLUSIVE_LOCK;
-let get_data: (Vec<ForTestItem>, Option<(u32,String,String,f32,i32,u16)>) = my_run_tran(&mut tran, getsql).unwrap();
+let get_data: Vec<ForTestItem> = my_run_tran_vec(&mut tran, getsql).unwrap();
 let tmp = get_data.0;
 if tmp.len() == 0 {
     tran.rollback().unwrap();

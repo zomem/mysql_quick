@@ -3,7 +3,7 @@
 /// 计数 ，返回 sql 语句，参数同 find 类似。
 /// Count, get back sql, the params same as find.
 /// ```
-/// let res_count: (Vec<u64>, Option<u64>) = run(&mut conn, mycount!("feedback", {})).unwrap();
+/// let res_count: (Vec<u64>, Option<u64>) = my_run(&mut conn, mycount!("feedback", {})).unwrap();
 /// println!("Count 结果： {:#?}", res_count.0[0]);
 /// 
 /// 
@@ -323,7 +323,7 @@ macro_rules! mycount {
                 where_r = " WHERE ".to_string() + qq_all.as_str();
             }
 
-            let sql = "SELECT count(*) as count".to_string() +
+            let sql = "SELECT count(*) as mysql_quick_count".to_string() +
                 " FROM " + $t +
                 _join.as_str() +
                 where_r.as_str();

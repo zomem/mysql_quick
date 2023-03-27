@@ -15,7 +15,7 @@
 ///     },
 /// ]);
 /// 
-/// run(&mut sql).unwrap();
+/// my_run_drop(&mut sql).unwrap();
 /// ```
 #[macro_export]
 macro_rules! mysetmany {

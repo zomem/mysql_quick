@@ -8,7 +8,7 @@
 ///     "name": string_t.clone(),
 ///     "num": 882,
 /// });
-/// run_set(&mut conn, sql).unwrap();
+/// my_run_drop(&mut conn, sql).unwrap();
 /// ```
 #[macro_export] 
 macro_rules! myset {
