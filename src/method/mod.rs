@@ -1,5 +1,3 @@
-
-
 #[macro_use]
 mod mycount;
 
@@ -21,10 +19,11 @@ mod mysetmany;
 #[macro_use]
 mod myupdate;
 
+#[macro_use]
+mod myupdatemany;
 
 mod method;
 pub use method::*;
-
 
 /// 常用的 mysql 锁类型。直接加在 sql 语句后面
 pub const MY_SHARED_LOCK: &str = " LOCK IN SHARE MODE";

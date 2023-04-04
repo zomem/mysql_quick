@@ -1,16 +1,17 @@
 
 
-### mysql 数据库连接方法封装  
-  
-|  方法   | 说明  |
+### mysql 数据库连接方法封装
+
+|  sql方法   | 说明  |
 |  ----  | ----  |
-| mycount  | 返回计数 |
-| mydel  | 删除一条数据 |
-| myfind  | 查寻数据 |
-| myget  | 查寻一条数据 |
-| myset  | 新增一条数据 |
-| mysetmany  | 批量新增数据 |
-| myupdate  | 更新一条数据 |
+| mycount  | 返回计数的sql |
+| mydel  | 删除一条数据的sql |
+| myfind  | 查寻数据的sql |
+| myget  | 查寻一条数据的sql |
+| myset  | 新增一条数据的sql |
+| mysetmany  | 批量新增数据的sql |
+| myupdate  | 更新一条数据的sql |
+| myupdatemany  | 批量更新数据的sql |
 
 依赖：
 ```toml
@@ -20,8 +21,16 @@ serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 regex = "1.7"
 ```
 
-### mysql 查寻示例  
-run、run_drop  
+### mysql 查寻示例
+my_run_vec、my_run_drop
+```rust
+let id: u64 = my_run_drop(&mut conn, sql).unwrap();
+let data: Vec<T> = my_run_vec(&mut conn, sql).unwrap();
+```
+
+
+### sql快捷生成
+以下内容，则为常用sql的快捷方法
 ```rust
 use mysql_quick::{MysqlQuick, run, find ...};
 pub fn mysql_conn() -> PooledConn {
@@ -45,15 +54,24 @@ my_run_drop(&mut conn, myupdate!("for_test", 56, {
 })).unwrap();
 
 // 批量 新增数据
-let msql = mysetmany!("for_test", [
-    {"uid": 1, "content": "批量更新00adf"},
-    {"uid": 2, "content": "2342341"},
-    {"uid": 3, "content": "mmmmm"},
-    {"uid": 4, "content": "zzzzzz"},
-    {"uid": 5, "content": "奔苦asda工工"},
-    {"uid": 6, "content": "555"}
-]);
+let msql_2 = mysetmany!("for_test", vec![
+    Item {"uid": 1, "content": "批量更新00adf"},
+    Item {"uid": 2, "content": "2342341"},
+    Item {"uid": 3, "content": "mmmmm"},
+])
 my_run_drop(&mut conn, msql).unwrap();
+
+// 批量 更新数据
+let sql = myupdatemany!("for_test", "uid", vec![
+    Item {"uid": 1, "content": "批量更新00adf"},
+    Item {"uid": 2, "content": "2342341"},
+])
+my_run_drop(&mut conn, sql).unwrap();
+
+
+
+
+
 
 // 获取一条数据
 let sql1 = myget!("for_test", 33, "id as id, feedback.content as cc");
@@ -79,8 +97,8 @@ let res_count: Vec<u64> = my_run_vec(&mut conn, mycount!("for_test", {})).unwrap
 ```
 
 
-### mysql 事务示例  
-run_tran、run_tran_drop  
+### mysql 事务示例
+my_run_tran_vec、my_run_tran_drop
 ```rust
 use mysql_quick::{TxOpts, MY_EXCLUSIVE_LOCK, MY_SHARED_LOCK};
 
