@@ -39,9 +39,9 @@
 #[macro_export]
 macro_rules! myupdatemany {
     ($t:expr, $i:expr, $v: expr) => {{
-        fn type_of<T>(_: T) -> &'static str {
-            std::any::type_name::<T>()
-        }
+        // fn type_of<T>(_: T) -> &'static str {
+        //     std::any::type_name::<T>()
+        // }
         let i_info = $i.clone();
 
         let i_vec: Vec<String> = i_info

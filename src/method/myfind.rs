@@ -1,19 +1,17 @@
-
-
 /// 查寻数据，返回sql
-/// 
-/// 完整参数如下，注意，参数可以省略，但顺序固定。select 必传且不能为*。 
+///
+/// 完整参数如下，注意，参数可以省略，但顺序固定。select 必传且不能为*。
 /// ```
-/// 
+///
 /// j*: 为 join 操作，["字段", "方法", "字段2"]， 主表"字段"，可以只写字段名
 /// j*方法有：`inner、left、right`
 /// p*: 为查寻操作，["字段", "方法", "参数"],  主表"字段"，可以只写字段名
 /// p*查寻方法有：`>、<、=、!=、<=、>=、like、in、not_in、is_null`
-/// 
+///
 /// ```
-/// 
+///
 /// ```
-/// 
+///
 /// // 重命名用 as 操作
 /// myfind!("feedback as fb", {
 ///     j0: ["uid", "inner", "users.id"],
@@ -36,8 +34,8 @@
 ///     order_by: "-created_at,   time, -users.updated_at", // 排序
 ///     select: "id, name,   avatar_url as aurl,users.c, u2.name", // 字段选择
 /// });
-/// 
-/// 
+///
+///
 /// // 记得要加上 Serialize, Deserialize
 /// #[derive(Serialize, Deserialize)]
 /// struct Feedback {
@@ -46,7 +44,7 @@
 ///     content: String,
 ///     created_at: String,
 /// }
-/// let data: (Vec<Feedback>, Option<(u64,u64,String,String)>) = 
+/// let data: (Vec<Feedback>, Option<(u64,u64,String,String)>) =
 ///     my_run(&mut conn, myfind!("feedback", {
 ///         p0: ["uid", ">", 0],
 ///         r: "p0",
@@ -125,12 +123,17 @@ macro_rules! myfind {
             }
             fn _get_p(k: &str, m: &str, v: &str, vty: &str, main_table_change: &str) -> String {
                 let tmp_v = match vty {
-                    "&str" => {
+                    "&&str" => {
                         let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\""
                     },
-                    "alloc::string::String" => {
+                    "&alloc::string::String" => {
+                        let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        "\"".to_string() + &v_r + "\""
+                    },
+                    "&&alloc::string::String" => {
                         let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\""
@@ -197,7 +200,7 @@ macro_rules! myfind {
             }
 
 
-            
+
             let _table_change = get_table($t);
 
             let mut _join = String::from("");
@@ -225,80 +228,80 @@ macro_rules! myfind {
             let mut hash_p: std::collections::HashMap<String, String> = std::collections::HashMap::new();
             {
                 $(
-                    let tm = $v0.clone();
-                    let vt = _type_of($v0);
+                    let tm = $v0;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p0".to_string(), _get_p($k0, $m0, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v1.clone();
-                    let vt = _type_of($v1);
+                    let tm = $v1;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p1".to_string(), _get_p($k1, $m1, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v2.clone();
-                    let vt = _type_of($v2);
+                    let tm = $v2;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p2".to_string(), _get_p($k2, $m2, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v3.clone();
-                    let vt = _type_of($v3);
+                    let tm = $v3;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p3".to_string(), _get_p($k3, $m3, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v4.clone();
-                    let vt = _type_of($v4);
+                    let tm = $v4;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p4".to_string(), _get_p($k4, $m4, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v5.clone();
-                    let vt = _type_of($v5);
+                    let tm = $v5;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p5".to_string(), _get_p($k5, $m5, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v6.clone();
-                    let vt = _type_of($v6);
+                    let tm = $v6;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p6".to_string(), _get_p($k6, $m6, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v7.clone();
-                    let vt = _type_of($v7);
+                    let tm = $v7;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p7".to_string(), _get_p($k7, $m7, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v8.clone();
-                    let vt = _type_of($v8);
+                    let tm = $v8;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p8".to_string(), _get_p($k8, $m8, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v9.clone();
-                    let vt = _type_of($v9);
+                    let tm = $v9;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p9".to_string(), _get_p($k9, $m9, t.as_str(), vt, _table_change));
                 )?
@@ -307,7 +310,7 @@ macro_rules! myfind {
             let mut where_r = String::from("");
             let mut _r = String::from("");
             let mut _list: Vec<&str> = vec![];
-            $( 
+            $(
                 _r = $r.split_whitespace().collect();
                 let re1 = regex::Regex::new(r"(\()|(\))").unwrap();
                 _r = re1.replace_all(_r.as_str(), "#$1$2#").to_string();
@@ -335,10 +338,10 @@ macro_rules! myfind {
                         let top_re2 = re2.replace_all(top_brackets.as_str(), "#$1$2#");
                         let temp_arr: Vec<&str> = top_re2.split("#").collect();
                         // [p9, &&, p8, ||, p32]
-    
+
                         let mut temp_qq = if let Some(p_x) = hash_p.get(temp_arr[0]) {p_x.to_string()} else {"".to_string()};
                         let mut n = 0;
-    
+
                         loop {
                             if n < temp_arr.len() - 1 {
                                 let tmp = if let Some(p_x) = hash_p.get(temp_arr[n + 2]) {p_x} else {""};
@@ -369,7 +372,7 @@ macro_rules! myfind {
                 let re3 = regex::Regex::new(r"(&&)|(\|\|)").unwrap();
                 let top_re3 = re3.replace_all(temp_arr_str2.as_str(), "#$1$2#");
                 let temp_arr2: Vec<&str> = top_re3.split("#").collect();
-                
+
                 let mut qq_all = if let Some(p_x) = hash_p.get(temp_arr2[0]) {p_x.to_string()} else {"".to_string()};
                 let mut n_all = 0;
                 loop {
@@ -387,10 +390,10 @@ macro_rules! myfind {
                         break;
                     }
                 }
-    
+
                 where_r = " WHERE ".to_string() + qq_all.as_str();
             }
-            
+
 
             let mut _page: u32 = 0;
             let mut _limit: u32 = 0;
@@ -398,15 +401,15 @@ macro_rules! myfind {
             $( _limit = $limit; )?
             let mut _limit_page = String::from("");
             if _page > 0 && _limit > 0 {
-                _limit_page = " LIMIT ".to_string() + _limit.to_string().as_str() + 
+                _limit_page = " LIMIT ".to_string() + _limit.to_string().as_str() +
                     " OFFSET " + (_limit * (_page - 1)).to_string().as_str();
             } else if _page > 0 {
                 _limit = 20;
-                _limit_page = " LIMIT ".to_string() + _limit.to_string().as_str() + 
+                _limit_page = " LIMIT ".to_string() + _limit.to_string().as_str() +
                     " OFFSET " + (_limit * (_page - 1)).to_string().as_str();
             } else if _limit > 0 {
                 _page = 1;
-                _limit_page = " LIMIT ".to_string() + _limit.to_string().as_str() + 
+                _limit_page = " LIMIT ".to_string() + _limit.to_string().as_str() +
                     " OFFSET " + (_limit * (_page - 1)).to_string().as_str();
             } else {
                 _limit_page = " ".to_string();
@@ -416,7 +419,7 @@ macro_rules! myfind {
             $(
                 _order_by = _get_order_by($order_by, _table_change);
             )?
-            
+
             let mut _select = "*";
             $(
                 let tmp_s = _get_select($select, _table_change);
@@ -434,6 +437,3 @@ macro_rules! myfind {
         }
     };
 }
-
-
-

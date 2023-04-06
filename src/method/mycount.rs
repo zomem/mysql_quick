@@ -1,12 +1,10 @@
-
-
 /// 计数 ，返回 sql 语句，参数同 find 类似。
 /// Count, get back sql, the params same as find.
 /// ```
 /// let res_count: (Vec<u64>, Option<u64>) = my_run(&mut conn, mycount!("feedback", {})).unwrap();
 /// println!("Count 结果： {:#?}", res_count.0[0]);
-/// 
-/// 
+///
+///
 /// // 条件计数
 /// mycount!(table, {
 ///     p0: ["price", ">", 100],
@@ -81,12 +79,17 @@ macro_rules! mycount {
             }
             fn _get_p(k: &str, m: &str, v: &str, vty: &str, main_table_change: &str) -> String {
                 let tmp_v = match vty {
-                    "&str" => {
+                    "&&str" => {
                         let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\""
                     },
-                    "alloc::string::String" => {
+                    "&alloc::string::String" => {
+                        let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        "\"".to_string() + &v_r + "\""
+                    },
+                    "&&alloc::string::String" => {
                         let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\""
@@ -127,7 +130,7 @@ macro_rules! mycount {
                 j_string
             }
 
-            
+
             let _table_change = get_table($t);
 
             let mut _join = String::from("");
@@ -156,90 +159,90 @@ macro_rules! mycount {
             let mut hash_p: std::collections::HashMap<String, String> = std::collections::HashMap::new();
             {
                 $(
-                    let tm = $v0.clone();
-                    let vt = _type_of($v0);
+                    let tm = $v0;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p0".to_string(), _get_p($k0, $m0, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v1.clone();
-                    let vt = _type_of($v1);
+                    let tm = $v1;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p1".to_string(), _get_p($k1, $m1, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v2.clone();
-                    let vt = _type_of($v2);
+                    let tm = $v2;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p2".to_string(), _get_p($k2, $m2, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v3.clone();
-                    let vt = _type_of($v3);
+                    let tm = $v3;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p3".to_string(), _get_p($k3, $m3, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v4.clone();
-                    let vt = _type_of($v4);
+                    let tm = $v4;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p4".to_string(), _get_p($k4, $m4, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v5.clone();
-                    let vt = _type_of($v5);
+                    let tm = $v5;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p5".to_string(), _get_p($k5, $m5, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v6.clone();
-                    let vt = _type_of($v6);
+                    let tm = $v6;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p6".to_string(), _get_p($k6, $m6, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v7.clone();
-                    let vt = _type_of($v7);
+                    let tm = $v7;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p7".to_string(), _get_p($k7, $m7, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v8.clone();
-                    let vt = _type_of($v8);
+                    let tm = $v8;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p8".to_string(), _get_p($k8, $m8, t.as_str(), vt, _table_change));
                 )?
             }
             {
                 $(
-                    let tm = $v9.clone();
-                    let vt = _type_of($v9);
+                    let tm = $v9;
+                    let vt = _type_of(&tm);
                     let t = tm.to_string();
                     hash_p.insert("p9".to_string(), _get_p($k9, $m9, t.as_str(), vt, _table_change));
                 )?
             }
-            
+
 
             let mut where_r = String::from("");
             let mut _r = String::from("");
             let mut _list: Vec<&str> = vec![];
-            $( 
+            $(
                 _r = $r.split_whitespace().collect();
                 let re1 = regex::Regex::new(r"(\()|(\))").unwrap();
                 _r = re1.replace_all(_r.as_str(), "#$1$2#").to_string();
@@ -267,10 +270,10 @@ macro_rules! mycount {
                         let top_re2 = re2.replace_all(top_brackets.as_str(), "#$1$2#");
                         let temp_arr: Vec<&str> = top_re2.split("#").collect();
                         // [p9, &&, p8, ||, p32]
-    
+
                         let mut temp_qq = if let Some(p_x) = hash_p.get(temp_arr[0]) {p_x.to_string()} else {"".to_string()};
                         let mut n = 0;
-    
+
                         loop {
                             if n < temp_arr.len() - 1 {
                                 let tmp = if let Some(p_x) = hash_p.get(temp_arr[n + 2]) {p_x} else {""};
@@ -301,7 +304,7 @@ macro_rules! mycount {
                 let re3 = regex::Regex::new(r"(&&)|(\|\|)").unwrap();
                 let top_re3 = re3.replace_all(temp_arr_str2.as_str(), "#$1$2#");
                 let temp_arr2: Vec<&str> = top_re3.split("#").collect();
-                
+
                 let mut qq_all = if let Some(p_x) = hash_p.get(temp_arr2[0]) {p_x.to_string()} else {"".to_string()};
                 let mut n_all = 0;
                 loop {
@@ -319,7 +322,7 @@ macro_rules! mycount {
                         break;
                     }
                 }
-    
+
                 where_r = " WHERE ".to_string() + qq_all.as_str();
             }
 
@@ -327,11 +330,8 @@ macro_rules! mycount {
                 " FROM " + $t +
                 _join.as_str() +
                 where_r.as_str();
-                
+
             sql
         }
     };
 }
-
-
-

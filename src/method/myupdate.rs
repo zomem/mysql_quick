@@ -34,15 +34,20 @@ macro_rules! myupdate {
                 std::any::type_name::<T>()
             }
             let tmp_ik = $ik.to_string();
-            let i_data = $iv.clone();
-            let i_type = type_of($iv);
+            let i_data = $iv;
+            let i_type = type_of(&i_data);
             let tmp_i = match i_type {
-                "&str" => {
+                "&&str" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "alloc::string::String" => {
+                "&alloc::string::String" => {
+                    let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
+                    v_r = v_r.replace("\"", "\\\"");
+                    "\"".to_string() + &v_r + "\""
+                },
+                "&&alloc::string::String" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
@@ -55,15 +60,20 @@ macro_rules! myupdate {
 
             let mut temp_s = String::from("");
             $(
-                let temp_v = $v.clone();
-                let v_type = type_of($v);
+                let temp_v = $v;
+                let v_type = type_of(&temp_v);
                 let value = match v_type {
-                    "&str" => {
+                    "&&str" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                        "\"".to_string() + &v_r + "\","
                     },
-                    "alloc::string::String" => {
+                    "&alloc::string::String" => {
+                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        "\"".to_string() + &v_r + "\","
+                    },
+                    "&&alloc::string::String" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\","
@@ -103,15 +113,20 @@ macro_rules! myupdate {
                 std::any::type_name::<T>()
             }
             let tmp_ik = $ik.to_string();
-            let i_data = $iv.clone();
-            let i_type = type_of($iv);
+            let i_data = $iv;
+            let i_type = type_of(&i_data);
             let tmp_i = match i_type {
-                "&str" => {
+                "&&str" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "alloc::string::String" => {
+                "&alloc::string::String" => {
+                    let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
+                    v_r = v_r.replace("\"", "\\\"");
+                    "\"".to_string() + &v_r + "\""
+                },
+                "&&alloc::string::String" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
@@ -124,15 +139,20 @@ macro_rules! myupdate {
 
             let mut temp_s = String::from("");
             $(
-                let temp_v = $v.clone();
-                let v_type = type_of($v);
+                let temp_v = $v;
+                let v_type = type_of(&temp_v);
                 let value = match v_type {
-                    "&str" => {
+                    "&&str" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                        "\"".to_string() + &v_r + "\","
                     },
-                    "alloc::string::String" => {
+                    "&alloc::string::String" => {
+                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        "\"".to_string() + &v_r + "\","
+                    },
+                    "&&alloc::string::String" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\","
@@ -159,15 +179,20 @@ macro_rules! myupdate {
             fn type_of<T>(_: T) -> &'static str {
                 std::any::type_name::<T>()
             }
-            let i_data = $i.clone();
-            let i_type = type_of($i);
+            let i_data = $i;
+            let i_type = type_of(&i_data);
             let tmp_i = match i_type {
-                "&str" => {
+                "&&str" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "alloc::string::String" => {
+                "&alloc::string::String" => {
+                    let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
+                    v_r = v_r.replace("\"", "\\\"");
+                    "\"".to_string() + &v_r + "\""
+                },
+                "&&alloc::string::String" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
@@ -180,15 +205,20 @@ macro_rules! myupdate {
 
             let mut temp_s = String::from("");
             $(
-                let temp_v = $v.clone();
-                let v_type = type_of($v);
+                let temp_v = $v;
+                let v_type = type_of(&temp_v);
                 let value = match v_type {
-                    "&str" => {
+                    "&&str" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                        "\"".to_string() + &v_r + "\","
                     },
-                    "alloc::string::String" => {
+                    "&alloc::string::String" => {
+                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        "\"".to_string() + &v_r + "\","
+                    },
+                    "&&alloc::string::String" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\","
@@ -227,15 +257,20 @@ macro_rules! myupdate {
             fn type_of<T>(_: T) -> &'static str {
                 std::any::type_name::<T>()
             }
-            let i_data = $i.clone();
-            let i_type = type_of($i);
+            let i_data = $i;
+            let i_type = type_of(&i_data);
             let tmp_i = match i_type {
-                "&str" => {
+                "&&str" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "alloc::string::String" => {
+                "&alloc::string::String" => {
+                    let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
+                    v_r = v_r.replace("\"", "\\\"");
+                    "\"".to_string() + &v_r + "\""
+                },
+                "&&alloc::string::String" => {
                     let mut v_r = i_data.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
@@ -248,15 +283,20 @@ macro_rules! myupdate {
 
             let mut temp_s = String::from("");
             $(
-                let temp_v = $v.clone();
-                let v_type = type_of($v);
+                let temp_v = $v;
+                let v_type = type_of(&temp_v);
                 let value = match v_type {
-                    "&str" => {
+                    "&&str" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                        "\"".to_string() + &v_r + "\","
                     },
-                    "alloc::string::String" => {
+                    "&alloc::string::String" => {
+                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        "\"".to_string() + &v_r + "\","
+                    },
+                    "&&alloc::string::String" => {
                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
                         "\"".to_string() + &v_r + "\","

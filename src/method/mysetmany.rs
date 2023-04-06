@@ -30,15 +30,20 @@ macro_rules! mysetmany {
     //             }
     //             values = values + " ( ";
     //             $(
-    //                 let temp_v = $v.clone();
-    //                 let v_type = type_of($v);
+    //                 let temp_v = $v;
+    //                 let v_type = type_of(&temp_v);
     //                 values = match v_type {
-    //                     "&str" => {
+    //                     "&&str" => {
     //                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
     //                         v_r = v_r.replace("\"", "\\\"");
     //                         values + "\"" + &v_r + "\","
     //                     },
-    //                     "alloc::string::String" => {
+    //                     "&alloc::string::String" => {
+    //                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+    //                         v_r = v_r.replace("\"", "\\\"");
+    //                         values + "\"" + &v_r + "\","
+    //                     },
+    //                     "&&alloc::string::String" => {
     //                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
     //                         v_r = v_r.replace("\"", "\\\"");
     //                         values + "\"" + &v_r + "\","

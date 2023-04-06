@@ -1,7 +1,5 @@
-
-
 /// 获取一条数据，一定要记录传`select`的字段且不能为*
-/// 
+///
 /// ```
 /// 根据 id 查寻
 /// // 查寻 id =3 3 的数据
@@ -13,14 +11,14 @@
 /// }
 /// let res_get: (Vec<Feedback>, Option<(u64, String)>) = my_run(&mut conn, sql1).unwrap();
 /// println!("结果》》 ： {:#?}", res_get);
-/// 
-/// 
+///
+///
 /// 根据指定字段查寻
 /// // 查寻 uid = 32 的数据
 /// myget!("table", {"uid": 32}, "id, nickname, age")
-/// 
+///
 /// ```
-/// 
+///
 #[macro_export]
 macro_rules! myget {
     ($t:expr, {$k:tt: $v:expr} $(,$select:expr)?$(,)?) => {
@@ -53,15 +51,20 @@ macro_rules! myget {
             }
 
             let keys = $k.to_string();
-            let temp_v = $v.clone();
-            let v_type = _type_of($v);
+            let temp_v = $v;
+            let v_type = _type_of(&temp_v);
             let values = match v_type {
-                "&str" => {
+                "&&str" => {
                     let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "alloc::string::String" => {
+                "&alloc::string::String" => {
+                    let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                    v_r = v_r.replace("\"", "\\\"");
+                    "\"".to_string() + &v_r + "\""
+                },
+                "&&alloc::string::String" => {
                     let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
@@ -80,7 +83,7 @@ macro_rules! myget {
             let sql = "SELECT ".to_string() + _select +
                 " FROM " + $t +
                 " WHERE " + keys.as_str() + "=" + values.as_str();
-        
+
             sql
         }
     };
@@ -113,15 +116,20 @@ macro_rules! myget {
                 tmp_select
             }
 
-            let temp_v = $v.clone();
-            let v_type = _type_of($v);
+            let temp_v = $v;
+            let v_type = _type_of(&temp_v);
             let values = match v_type {
-                "&str" => {
+                "&&str" => {
                     let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "alloc::string::String" => {
+                "&alloc::string::String" => {
+                    let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                    v_r = v_r.replace("\"", "\\\"");
+                    "\"".to_string() + &v_r + "\""
+                },
+                "&&alloc::string::String" => {
                     let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
@@ -140,11 +148,8 @@ macro_rules! myget {
             let sql = "SELECT ".to_string() + _select +
                 " FROM " + $t +
                 " WHERE id=" + values.as_str();
-        
+
             sql
         }
     };
 }
-
-
-

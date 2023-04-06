@@ -1,14 +1,12 @@
-
-use std::fmt::Debug;
 use mysql::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+use std::fmt::Debug;
 
-
-pub use mysql::TxOpts;
+pub use mysql::prelude::*;
 pub use mysql::PooledConn;
 pub use mysql::Transaction;
-pub use mysql::prelude::*;
+pub use mysql::TxOpts;
 
 pub struct MysqlQuick {
     pub pool: Pool,
@@ -22,14 +20,11 @@ impl MysqlQuick {
     pub fn new(min: usize, max: usize, url: &str) -> Result<MysqlQuick> {
         let pool = Pool::new_manual(min, max, url);
         match pool {
-            Ok(p) => Ok(MysqlQuick {
-                pool: p
-            }),
-            Err(e) => Err(e)
+            Ok(p) => Ok(MysqlQuick { pool: p }),
+            Err(e) => Err(e),
         }
     }
 }
-
 
 /// 运行sql语句，返回最近一条语句的数据id，如果上没有，则返回0，用于set返回对应的id。
 /// 其他方法mydel、mysetmany、myupdate，则不用管这个id。
@@ -39,15 +34,15 @@ impl MysqlQuick {
 ///    "content": "ADFaadf",
 ///    "uid": 9,
 /// })).unwrap();
-/// 
+///
 /// ```
-/// 
-/// 
+///
+///
 pub fn my_run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
     let temp_res = conn.query_drop(sql);
     match temp_res {
         Ok(_) => Ok(conn.last_insert_id()),
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 
@@ -64,15 +59,15 @@ pub fn my_run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
 /// let res_get: (Vec<Feedback>, Option<(u64, String)>) = my_run(&mut conn, sql1).unwrap();
 /// println!("get 结果 {:#?}", res_get);
 /// ```
-/// 
-/// 
+///
+///
 #[deprecated(since = "1.0.0", note = "此方法将在未来弃用，推荐使用 my_run_vec 。")]
 pub fn my_run<T, U>(conn: &mut PooledConn, sql: String) -> Result<(Vec<U>, Option<T>)>
 where
     T: FromRow + Serialize + Clone + Debug,
-    U: DeserializeOwned
+    U: DeserializeOwned,
 {
-    let tmp_f: String = get_select_field(sql.clone());
+    let tmp_f: String = get_select_field(&sql);
 
     let check_res: Result<Vec<T>> = conn.query(sql);
     match check_res {
@@ -81,11 +76,11 @@ where
                 Ok((vec![], None))
             } else {
                 let check_one = c[0].clone();
-                let res: Vec<U> = json_res(c, tmp_f.as_str());
+                let res: Vec<U> = json_res(&c, tmp_f.as_str());
                 Ok((res, Some(check_one)))
             }
-        },
-        Err(e) => Err(e)
+        }
+        Err(e) => Err(e),
     }
 }
 
@@ -102,20 +97,20 @@ where
 /// let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql1).unwrap();
 /// println!("get 结果 {:#?}", res_get);
 /// ```
-/// 
-/// 
+///
+///
 pub fn my_run_vec<U>(conn: &mut PooledConn, sql: String) -> Result<Vec<U>>
 where
-    U: DeserializeOwned
+    U: DeserializeOwned,
 {
-    let tmp_f: String = get_select_field(sql.clone());
+    let tmp_f: String = get_select_field(&sql);
     let rows: Result<Vec<Row>> = conn.exec(sql, ());
     match rows {
         Ok(r) => {
-            let j_res: Vec<U> = json_rows(r, tmp_f.as_str());
+            let j_res: Vec<U> = json_rows(&r, tmp_f.as_str());
             Ok(j_res)
-        },
-        Err(e) => Err(e)
+        }
+        Err(e) => Err(e),
     }
 }
 
@@ -128,24 +123,24 @@ where
 ///    "content": "ADFaadf",
 ///     "uid": 9,
 /// })).unwrap();
-/// 
+///
 /// my_run_tran_drop(&mut tran, mydel!("feedback", 50)).unwrap();
-/// 
+///
 /// my_run_tran_drop(&mut tran, myupdate!("feedback", 56, {
 ///     "content": "更新后的内容，一一一一"
 /// })).unwrap();
 /// ```
-/// 
-/// 
+///
+///
 pub fn my_run_tran_drop(tran: &mut Transaction, sql: String) -> Result<u64> {
     let temp_tran = tran.query_drop(sql);
     match temp_tran {
         Ok(_) => {
             let id = tran.last_insert_id();
-            let id = if let Some(i) = id {i} else {0};
+            let id = if let Some(i) = id { i } else { 0 };
             Ok(id)
-        },
-        Err(e) => Err(e)
+        }
+        Err(e) => Err(e),
     }
 }
 /// ### 事务执行
@@ -162,15 +157,18 @@ pub fn my_run_tran_drop(tran: &mut Transaction, sql: String) -> Result<u64> {
 /// let res_get: (Vec<Feedback>, Option<(u64, String)>) = my_run_tran(&mut tran, sql1).unwrap();
 /// println!("get 结果 {:#?}", res_get);
 /// ```
-/// 
-/// 
-#[deprecated(since = "1.0.0", note = "此方法将在未来弃用，推荐使用 my_run_tran_vec 。")]
+///
+///
+#[deprecated(
+    since = "1.0.0",
+    note = "此方法将在未来弃用，推荐使用 my_run_tran_vec 。"
+)]
 pub fn my_run_tran<T, U>(tran: &mut Transaction, sql: String) -> Result<(Vec<U>, Option<T>)>
 where
     T: FromRow + Serialize + Clone + Debug,
-    U: DeserializeOwned
+    U: DeserializeOwned,
 {
-    let tmp_f: String = get_select_field(sql.clone());
+    let tmp_f: String = get_select_field(&sql);
     let check_res: Result<Vec<T>> = tran.query(sql);
     match check_res {
         Ok(c) => {
@@ -178,11 +176,11 @@ where
                 Ok((vec![], None))
             } else {
                 let check_one = c[0].clone();
-                let res: Vec<U> = json_res(c, tmp_f.as_str());
+                let res: Vec<U> = json_res(&c, tmp_f.as_str());
                 Ok((res, Some(check_one)))
             }
-        },
-        Err(e) => Err(e)
+        }
+        Err(e) => Err(e),
     }
 }
 
@@ -200,31 +198,26 @@ where
 /// let res_get: Vec<Feedback> = my_run_tran_vec(&mut tran, sql1).unwrap();
 /// println!("get 结果 {:#?}", res_get);
 /// ```
-/// 
-/// 
+///
+///
 pub fn my_run_tran_vec<U>(tran: &mut Transaction, sql: String) -> Result<Vec<U>>
 where
-    U: DeserializeOwned
+    U: DeserializeOwned,
 {
-    let tmp_f: String = get_select_field(sql.clone());
+    let tmp_f: String = get_select_field(&sql);
     let rows: Result<Vec<Row>> = tran.exec(sql, ());
     match rows {
         Ok(r) => {
-            let j_res: Vec<U> = json_rows(r, tmp_f.as_str());
+            let j_res: Vec<U> = json_rows(&r, tmp_f.as_str());
             Ok(j_res)
-        },
-        Err(e) => Err(e)
+        }
+        Err(e) => Err(e),
     }
 }
 
-
-
-
-
-
-fn json_rows<U>(rows: Vec<Row>, fields: &str) -> Vec<U> 
+fn json_rows<U>(rows: &Vec<Row>, fields: &str) -> Vec<U>
 where
-    U: DeserializeOwned
+    U: DeserializeOwned,
 {
     let mut j_st = String::from("[");
     let field_string: String = fields.split_whitespace().collect();
@@ -235,16 +228,24 @@ where
     }
     if field_list.len() == 1 {
         if field_list[0] == "mysql_quick_count" {
-            let tmp = if let Some(s) = as_string(rows[0].clone(), 0) {s} else {String::from("null")};
+            let tmp = if let Some(s) = as_string(&rows[0], 0) {
+                s
+            } else {
+                String::from("null")
+            };
             let json_result: Vec<U> = serde_json::from_str(format!("[{tmp}]").as_str()).unwrap();
             return json_result;
         }
     }
     for i in 0..rows.len() {
-        let row = rows[i].clone();
+        let row = &rows[i];
         let mut one = "{".to_string();
         for (n, f_name) in field_list.iter().enumerate() {
-            let tmp = if let Some(s) = as_string(row.clone(), n) {s} else {String::from("null")};
+            let tmp = if let Some(s) = as_string(row, n) {
+                s
+            } else {
+                String::from("null")
+            };
             one = one + "\"" + *f_name + "\": " + tmp.as_str() + ",";
         }
         one.pop();
@@ -258,28 +259,31 @@ where
     json_result
 }
 
-fn as_string(row: Row, index: usize) -> Option<String> {
+fn as_string(row: &Row, index: usize) -> Option<String> {
     row.as_ref(index).map(|value| match value {
         Value::NULL => String::from("null"),
-        Value::Bytes(v) => "\"".to_string() + String::from_utf8_lossy(v.as_slice()).into_owned().as_str() + "\"",
+        Value::Bytes(v) => {
+            "\"".to_string() + String::from_utf8_lossy(v.as_slice()).into_owned().as_str() + "\""
+        }
         Value::Int(v) => format!("{v}"),
         Value::UInt(v) => format!("{v}"),
         Value::Float(v) => format!("{v}"),
         Value::Double(v) => format!("{v}"),
-        Value::Date(year, month, day, hour, minutes, seconds, _micro) 
-            => format!("\"{year}-{month}-{day} {hour}:{minutes}:{seconds}\""),
-        Value::Time(negative, days, hours, minutes, seconds, micro) 
-            => format!("\"{negative} {days} {hours}:{minutes}:{seconds}.{micro}\""),
+        Value::Date(year, month, day, hour, minutes, seconds, _micro) => {
+            format!("\"{year}-{month}-{day} {hour}:{minutes}:{seconds}\"")
+        }
+        Value::Time(negative, days, hours, minutes, seconds, micro) => {
+            format!("\"{negative} {days} {hours}:{minutes}:{seconds}.{micro}\"")
+        }
     })
 }
-
 
 fn _type_of<T>(_: T) -> &'static str {
     std::any::type_name::<T>()
 }
 
 // 获取sql里面的 select 字段
-fn get_select_field(sql: String) -> String {
+fn get_select_field(sql: &String) -> String {
     let re = regex::Regex::new(r"SELECT(.*)FROM").unwrap();
     let caps = re.captures(sql.as_str()).unwrap();
 
@@ -291,17 +295,17 @@ fn get_select_field(sql: String) -> String {
         let temp_tf = *tf;
         if temp_tf.contains(" as ") {
             let tmpt: Vec<&str> = temp_tf.split("as").collect();
-            let tmp_f = if let Some(l) = tmpt.last() {*l} else {""};
+            let tmp_f = if let Some(l) = tmpt.last() { *l } else { "" };
             let field: String = tmp_f.split_whitespace().collect();
             field_vec.push(field);
         } else if temp_tf.contains(" AS ") {
             let tmpt: Vec<&str> = temp_tf.split("AS").collect();
-            let tmp_f = if let Some(l) = tmpt.last() {*l} else {""};
+            let tmp_f = if let Some(l) = tmpt.last() { *l } else { "" };
             let field: String = tmp_f.split_whitespace().collect();
             field_vec.push(field);
         } else if temp_tf.contains(".") {
             let tmpt: Vec<&str> = temp_tf.split(".").collect();
-            let tmp_f = if let Some(l) = tmpt.last() {*l} else {""};
+            let tmp_f = if let Some(l) = tmpt.last() { *l } else { "" };
             let field: String = tmp_f.split_whitespace().collect();
             field_vec.push(field);
         } else {
@@ -311,18 +315,14 @@ fn get_select_field(sql: String) -> String {
     }
 
     let result_field = field_vec.join(",");
-    
+
     result_field
 }
 
-
-
-
-
-fn json_res<T, U>(p: Vec<T>, fields: &str) -> Vec<U> 
+fn json_res<T, U>(p: &Vec<T>, fields: &str) -> Vec<U>
 where
     T: FromRow + Serialize + Debug,
-    U: DeserializeOwned
+    U: DeserializeOwned,
 {
     let mut j_st = String::from("[");
     let field_string: String = fields.split_whitespace().collect();
@@ -332,11 +332,11 @@ where
         if v_type.contains("(") {
             let tuple_i = serde_json::to_string_pretty(item).unwrap();
             let tm2: Vec<&str> = tuple_i.split("\n").collect();
-            let tm = &tm2[1..tm2.len()-1];
+            let tm = &tm2[1..tm2.len() - 1];
             let mut one = "{".to_string();
             for (i, f_name) in field_list.iter().enumerate() {
                 let mut tmp = tm[i].to_string();
-                let last = &tmp[tmp.len()-1..tmp.len()];
+                let last = &tmp[tmp.len() - 1..tmp.len()];
                 if last == "," {
                     tmp.pop();
                 }
