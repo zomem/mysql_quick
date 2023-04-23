@@ -5,6 +5,7 @@
 /// let sql = myset!("users", {
 ///     "name": &string_t,
 ///     "num": 882,
+///     "content": "null",   // null 表示该字段为NULL
 /// });
 /// my_run_drop(&mut conn, sql).unwrap();
 /// ```
@@ -23,26 +24,30 @@ macro_rules! myset {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                values = match v_type {
-                    "&&str" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        values + "\"" + &v_r + "\","
-                    },
-                    "&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        values + "\"" + &v_r + "\","
-                    },
-                    "&&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        values + "\"" + &v_r + "\","
-                    },
-                    _ => {
-                        values + temp_v.to_string().as_str() + ","
-                    }
-                };
+                if temp_v.to_string().as_str() == "null" {
+                    values = values + "NULL,";
+                } else {
+                    values = match v_type {
+                        "&&str" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            values + "\"" + &v_r + "\","
+                        },
+                        "&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            values + "\"" + &v_r + "\","
+                        },
+                        "&&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            values + "\"" + &v_r + "\","
+                        },
+                        _ => {
+                            values + temp_v.to_string().as_str() + ","
+                        }
+                    };
+                }
             )+
 
             keys.pop();

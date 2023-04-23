@@ -43,6 +43,7 @@ let mut conn = mysql_conn();
 let id = my_run_drop(&mut conn, myset!("for_test", {
     "content": "ADFaadf",
     "uid": 9,
+    "info": if let Some(a) = one_info {a} else {"null"},
 })).unwrap();
 
 // 删除一条数据

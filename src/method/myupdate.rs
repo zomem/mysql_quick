@@ -4,6 +4,7 @@
 /// let sql = myupdate!("feedback", 50, {
 ///     "content": "这里有",
 ///     "uid": 77,
+///     “des”: "null",    // 表示更新该字段值为NULL
 /// })  // id = 50
 ///
 /// my_run_drop(&mut sql).unwrap();
@@ -62,26 +63,32 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let value = match v_type {
-                    "&&str" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                       "\"".to_string() + &v_r + "\","
-                    },
-                    "&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    "&&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    _ => {
-                        temp_v.to_string() + ","
-                    }
-                };
+                let mut value = String::from("");
+                if temp_v.to_string().as_str() == "null" {
+                    value = "NULL,".to_string();
+                } else {
+                    value = match v_type {
+                        "&&str" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        _ => {
+                            temp_v.to_string() + ","
+                        }
+                    };
+                }
+
                 let tmp_s = match $m {
                     "set" => $k.to_string() + "=" + value.as_str(),
                     "incr" => {
@@ -141,26 +148,31 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let value = match v_type {
-                    "&&str" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                       "\"".to_string() + &v_r + "\","
-                    },
-                    "&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    "&&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    _ => {
-                        temp_v.to_string() + ","
-                    }
-                };
+                let mut value = String::from("");
+                if temp_v.to_string().as_str() == "null" {
+                    value = "NULL,".to_string();
+                } else {
+                    value = match v_type {
+                        "&&str" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        _ => {
+                            temp_v.to_string() + ","
+                        }
+                    };
+                }
                 let tmp_s = $k.to_string() + "=" + value.as_str();
                 temp_s = temp_s + tmp_s.as_str();
             )+
@@ -207,26 +219,31 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let value = match v_type {
-                    "&&str" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                       "\"".to_string() + &v_r + "\","
-                    },
-                    "&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    "&&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    _ => {
-                        temp_v.to_string() + ","
-                    }
-                };
+                let mut value = String::from("");
+                if temp_v.to_string().as_str() == "null" {
+                    value = "NULL,".to_string();
+                } else {
+                    value = match v_type {
+                        "&&str" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        _ => {
+                            temp_v.to_string() + ","
+                        }
+                    };
+                }
                 let tmp_s = match $m {
                     "set" => $k.to_string() + "=" + value.as_str(),
                     "incr" => {
@@ -285,26 +302,31 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let value = match v_type {
-                    "&&str" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                       "\"".to_string() + &v_r + "\","
-                    },
-                    "&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    "&&alloc::string::String" => {
-                        let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                        v_r = v_r.replace("\"", "\\\"");
-                        "\"".to_string() + &v_r + "\","
-                    },
-                    _ => {
-                        temp_v.to_string() + ","
-                    }
-                };
+                let mut value = String::from("");
+                if temp_v.to_string().as_str() == "null" {
+                    value = "NULL,".to_string();
+                } else {
+                    value = match v_type {
+                        "&&str" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        "&&alloc::string::String" => {
+                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
+                            v_r = v_r.replace("\"", "\\\"");
+                            "\"".to_string() + &v_r + "\","
+                        },
+                        _ => {
+                            temp_v.to_string() + ","
+                        }
+                    };
+                }
                 let tmp_s = $k.to_string() + "=" + value.as_str();
                 temp_s = temp_s + tmp_s.as_str();
             )+
