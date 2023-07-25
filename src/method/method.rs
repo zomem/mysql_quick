@@ -259,11 +259,21 @@ where
     json_result
 }
 
+// fn is_json_string(s: &str) -> bool {
+//     match serde_json::from_str::<serde_json::Value>(s) {
+//         Ok(_) => true,
+//         Err(_) => false,
+//     }
+// }
 fn as_string(row: &Row, index: usize) -> Option<String> {
     row.as_ref(index).map(|value| match value {
         Value::NULL => String::from("null"),
         Value::Bytes(v) => {
-            "\"".to_string() + String::from_utf8_lossy(v.as_slice()).into_owned().as_str() + "\""
+            let mut info = String::from_utf8_lossy(v.as_slice())
+                .into_owned()
+                .to_string();
+            info = serde_json::to_string(&info).unwrap();
+            format!(r#"{info}"#)
         }
         Value::Int(v) => format!("{v}"),
         Value::UInt(v) => format!("{v}"),

@@ -9,7 +9,7 @@
 ///     id: u64,
 ///     cc: String
 /// }
-/// let res_get: (Vec<Feedback>, Option<(u64, String)>) = my_run(&mut conn, sql1).unwrap();
+/// let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql1).unwrap();
 /// println!("结果》》 ： {:#?}", res_get);
 ///
 ///
