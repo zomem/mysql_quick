@@ -1,8 +1,37 @@
 
 
 ### mysql 数据库连接方法封装
+```rust
+use mysql_quick::{MysqlQuick, run, find ...};
+pub fn mysql_conn() -> PooledConn {
+    let conn = MysqlQuick::new("mysql://root:12345678@localhost:3306/dev_db").unwrap().pool.get_conn().unwrap();
+    conn
+}
+let mut conn = mysql_conn();
+```
 
-|  sql方法   | 说明  |
+
+### mysql 查寻方法
+
+|  运行sql   | 说明  |
+|  ----  | ----  |
+| my_run_vec  | 执行sql，返回vec类型数据，无数据则返回`vec![]` |
+| my_run_drop  | 执行sql，无返回数据，最多返回id |
+| my_run_tran_vec  | 事务执行sql，有返回vec类型数据，无数据则返回`vec![]` |
+| my_run_tran_drop  | 事务执行sql，无返回数据，最多返回id |
+
+```rust
+let id: u64 = my_run_drop(&mut conn, sql).unwrap();
+
+// 执行 sql 语句
+let data: Vec<serde_json::Value> = my_run_vec(&mut conn, sql).unwrap();
+```
+
+
+
+### sql快捷生成
+
+|  sql快捷生成方法   | 说明  |
 |  ----  | ----  |
 | mycount  | 返回计数的sql |
 | mydel  | 删除一条数据的sql |
@@ -12,32 +41,11 @@
 | mysetmany  | 批量新增数据的sql |
 | myupdate  | 更新一条数据的sql |
 | myupdatemany  | 批量更新数据的sql |
-
-依赖：
-```toml
-mysql = "23.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-regex = "1.7"
-```
-
-### mysql 查寻示例
-my_run_vec、my_run_drop
-```rust
-let id: u64 = my_run_drop(&mut conn, sql).unwrap();
-let data: Vec<T> = my_run_vec(&mut conn, sql).unwrap();
-```
+| 自定义  | 可以直接写自己的sql语句 |
 
 
-### sql快捷生成
 以下内容，则为常用sql的快捷方法
 ```rust
-use mysql_quick::{MysqlQuick, run, find ...};
-pub fn mysql_conn() -> PooledConn {
-    let conn = MysqlQuick::new(1, 10, "mysql://root:12345678@localhost:3306/dev_db").unwrap().pool.get_conn().unwrap();
-    conn
-}
-let mut conn = mysql_conn();
 
 // 新增一条数据
 let id = my_run_drop(&mut conn, myset!("for_test", {
@@ -71,11 +79,8 @@ my_run_drop(&mut conn, sql).unwrap();
 
 
 
-
-
-
 // 获取一条数据
-let sql1 = myget!("for_test", 33, "id as id, feedback.content as cc");
+let sql1 = myget!("for_test", 33, "id, content as cc");
 #[derive(Serialize, Deserialize, Debug)]
 struct Feedback {
     id: u64,
@@ -87,13 +92,16 @@ let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql1).unwrap();
 let sql_f = myfind!("for_test", {
     p0: ["uid", ">", 330],
     r: "p0",
-    select: "id, content as cc",
+    select: "*",
 });
 let res_find: Vec<Feedback> = my_run_vec(&mut conn, sql_f).unwrap();
 
 // 获取计数
-let res_count: Vec<u64> = my_run_vec(&mut conn, mycount!("for_test", {})).unwrap();
+let res_count: Vec<MysqlQuickCount> = my_run_vec(&mut conn, mycount!("for_test", {})).unwrap();
 
+// 自定义查寻
+let list: Vec<serde_json::Value> =
+    my_run_vec(&mut conn, "select distinct type_v3 from dishes".to_owned()).unwrap();
 
 ```
 

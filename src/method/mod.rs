@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 #[macro_use]
 mod mycount;
 
@@ -29,3 +31,8 @@ pub use method::*;
 pub const MY_SHARED_LOCK: &str = " LOCK IN SHARE MODE";
 /// 悲观锁，用于抢单什么的
 pub const MY_EXCLUSIVE_LOCK: &str = " FOR UPDATE";
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq)]
+pub struct MysqlQuickCount {
+    pub mysql_quick_count: u64,
+}

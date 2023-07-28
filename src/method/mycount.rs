@@ -1,8 +1,9 @@
 /// 计数 ，返回 sql 语句，参数同 find 类似。
 /// Count, get back sql, the params same as find.
 /// ```
-/// let res_count: (Vec<u64>, Option<u64>) = my_run(&mut conn, mycount!("feedback", {})).unwrap();
-/// println!("Count 结果： {:#?}", res_count.0[0]);
+/// use mysql_quick::MysqlQuickCount;
+///
+/// let res_count: Vec<MysqlQuickCount> = my_run_vec(&mut conn, mycount!("feedback", {})).unwrap();
 ///
 ///
 /// // 条件计数
@@ -70,7 +71,7 @@ macro_rules! mycount {
                 let tmp_vl: Vec<&str> = tmp_v.split(",").collect();
                 let mut tmp_vs: Vec<String> = vec![];
                 for t in tmp_vl.iter() {
-                    let tm: String = t.split_whitespace().collect();
+                    let tm: String = t.to_string();
                     let mut v_r = tm.as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     tmp_vs.push( "\"".to_string() + &v_r + "\"");

@@ -15,7 +15,7 @@
 ///
 /// 根据指定字段查寻
 /// // 查寻 uid = 32 的数据
-/// myget!("table", {"uid": 32}, "id, nickname, age")
+/// myget!("table", {"uid": 32}, "*")
 ///
 /// ```
 ///

@@ -35,22 +35,6 @@
 ///     select: "id, name,   avatar_url as aurl,users.c, u2.name", // 字段选择
 /// });
 ///
-///
-/// // 记得要加上 Serialize, Deserialize
-/// #[derive(Serialize, Deserialize)]
-/// struct Feedback {
-///     id: u64,
-///     uid: u64,
-///     content: String,
-///     created_at: String,
-/// }
-/// let data: (Vec<Feedback>, Option<(u64,u64,String,String)>) =
-///     my_run(&mut conn, myfind!("feedback", {
-///         p0: ["uid", ">", 0],
-///         r: "p0",
-///         select: "id,uid,content,created_at",
-///     })).unwrap();
-/// ```
 #[macro_export]
 macro_rules! myfind {
     ($t:expr, {
@@ -114,7 +98,7 @@ macro_rules! myfind {
                 let tmp_vl: Vec<&str> = tmp_v.split(",").collect();
                 let mut tmp_vs: Vec<String> = vec![];
                 for t in tmp_vl.iter() {
-                    let tm: String = t.split_whitespace().collect();
+                    let tm: String = t.to_string();
                     let mut v_r = tm.as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     tmp_vs.push( "\"".to_string() + &v_r + "\"");
