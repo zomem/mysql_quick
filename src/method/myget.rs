@@ -10,8 +10,6 @@
 ///     cc: String
 /// }
 /// let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql1).unwrap();
-/// println!("结果》》 ： {:#?}", res_get);
-///
 ///
 /// 根据指定字段查寻
 /// // 查寻 uid = 32 的数据

@@ -1,30 +1,28 @@
 /// 1.通过id，更新数据 ，返回 sql 语句。
-/// Update one data by id (default).
 /// ```
 /// let sql = myupdate!("feedback", 50, {
 ///     "content": "这里有",
 ///     "uid": 77,
-///     “des”: "null",    // 表示更新该字段值为NULL
+///     "des": "null",    // 表示更新该字段值为NULL
 /// })  // id = 50
 ///
-/// my_run_drop(&mut sql).unwrap();
+/// my_run_drop(&mut conn, sql).unwrap();
 ///
-/// // 原子更新，
+/// // 原子更新，(如果使用[字段，值]的方式，都所有都需要使用这种形式)
 /// let sql2 = myupdate!("feedback", 50, {
 ///     "content": ["set", "更新"],  // set 就是替换操作
 ///     "uid": ["incr", -23],   // incr 原子性加减
 ///     "des": ["unset", ""]   // unset 清空值
-/// }) // 必须都带有[]
+/// })
 ///
 /// ```
 ///
 /// 2.通过指定字段的值，更新数据 ，返回 sql 语句。
-/// Update one data by filed value.
 /// ```
 /// // uid = 12
 /// let sql = myupdate!("feedback", {"uid": 12}, {"name": "zh"});
 ///
-/// my_run_drop(&mut sql).unwrap();
+/// my_run_drop(&mut conn, sql).unwrap();
 ///
 /// ```
 #[macro_export]
@@ -63,7 +61,7 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let mut value = String::from("");
+                let value;
                 if temp_v.to_string().as_str() == "null" {
                     value = "NULL,".to_string();
                 } else {
@@ -148,7 +146,7 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let mut value = String::from("");
+                let value;
                 if temp_v.to_string().as_str() == "null" {
                     value = "NULL,".to_string();
                 } else {
@@ -219,7 +217,7 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let mut value = String::from("");
+                let value;
                 if temp_v.to_string().as_str() == "null" {
                     value = "NULL,".to_string();
                 } else {
@@ -302,7 +300,7 @@ macro_rules! myupdate {
             $(
                 let temp_v = $v;
                 let v_type = type_of(&temp_v);
-                let mut value = String::from("");
+                let value;
                 if temp_v.to_string().as_str() == "null" {
                     value = "NULL,".to_string();
                 } else {

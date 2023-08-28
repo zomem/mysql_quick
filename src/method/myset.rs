@@ -1,6 +1,5 @@
 /// 新增数据 ，返回 sql 语句。
 /// 下面示例中，user 为表名，，name、num 为字段名，，后面为新增的值。
-/// Add new data, then return sql. exp: users table, field name and num. after them is value.
 /// ```
 /// let sql = myset!("users", {
 ///     "name": &string_t,

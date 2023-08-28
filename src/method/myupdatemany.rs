@@ -33,8 +33,8 @@
 /// 3.对某个字段进行原子性更新，返回 sql 语句。
 /// ```
 /// // 要行进 incr 的更新的字段，用+号填写。
-/// // 如下，表示以name为查寻条件，total字段要进行incr更新操作。
-/// let sql = myupdatemany!("content", "name,+total", vec_data);
+/// // 如下，表示以name,total为查寻条件，price字段要进行incr更新操作(price 不会作为查寻条件)。
+/// let sql = myupdatemany!("content", "name,total,+price", vec_data);
 /// ```
 #[macro_export]
 macro_rules! myupdatemany {

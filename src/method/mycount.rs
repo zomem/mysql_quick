@@ -1,5 +1,4 @@
 /// 计数 ，返回 sql 语句，参数同 find 类似。
-/// Count, get back sql, the params same as find.
 /// ```
 /// use mysql_quick::MysqlQuickCount;
 ///

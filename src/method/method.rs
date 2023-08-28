@@ -44,17 +44,14 @@ pub fn my_run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
 /// ### 用于：myget、myfind、mycount
 /// ### 示例
 /// ```
-/// let sql1 = myget!("feedback", 33, "id as id, feedback.content as cc");
+/// let sql = myget!("feedback", 33, "*");
 /// #[derive(Serialize, Deserialize, Debug)]
 /// struct Feedback {
 ///     id: u64,
 ///     cc: String
 /// }
-/// let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql1).unwrap();
-/// println!("get 结果 {:#?}", res_get);
+/// let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql).unwrap();
 /// ```
-///
-///
 pub fn my_run_vec<U>(conn: &mut PooledConn, sql: String) -> Result<Vec<U>>
 where
     U: DeserializeOwned,
@@ -159,7 +156,7 @@ where
     }
     j_st.pop();
     j_st.push(']');
-    println!("j_st>>>>>>>  {}\n", j_st);
+    // println!("j_st>>>>>>>  {}\n", j_st);
     let json_result: Vec<U> = serde_json::from_str(j_st.as_str()).unwrap();
     json_result
 }

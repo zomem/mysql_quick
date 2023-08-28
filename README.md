@@ -64,16 +64,16 @@ my_run_drop(&mut conn, myupdate!("for_test", 56, {
 
 // 批量 新增数据
 let msql_2 = mysetmany!("for_test", vec![
-    Item {"uid": 1, "content": "批量更新00adf"},
-    Item {"uid": 2, "content": "2342341"},
-    Item {"uid": 3, "content": "mmmmm"},
+    Item {uid: 1, content: "批量更新00adf"},
+    Item {uid: 2, content: "2342341"},
+    Item {uid: 3, content: "mmmmm"},
 ])
 my_run_drop(&mut conn, msql).unwrap();
 
 // 批量 更新数据
 let sql = myupdatemany!("for_test", "uid", vec![
-    Item {"uid": 1, "content": "批量更新00adf"},
-    Item {"uid": 2, "content": "2342341"},
+    Item {uid: 1, content: "批量更新00adf"},
+    Item {uid: 2, content: "2342341"},
 ])
 my_run_drop(&mut conn, sql).unwrap();
 

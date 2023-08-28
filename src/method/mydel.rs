@@ -1,5 +1,4 @@
 /// 通过id，删除数据 ，返回 sql 语句。
-/// Delete one data by id (default).
 /// ```
 /// let sql = mydel!("feedback", 2);  // where id = 2
 /// // 执行
@@ -7,7 +6,6 @@
 ///
 /// ```
 /// 通过指定字段的值，删除数据 ，返回 sql 语句。
-/// Delete one data by filed value.
 /// ```
 /// // 删除 uid = 12 的数据
 /// let sql = mydel!("feedback", {"uid": 12});
