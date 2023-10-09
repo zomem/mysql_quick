@@ -1,6 +1,6 @@
 [package]
 name = "mysql_quick"
-version = "1.0.1"
+version = "1.2.1"
 edition = "2021"
 authors = ["zomem"]
 description = "mysql 数据库快速连接方法"
@@ -18,3 +18,4 @@ mysql = "24.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 regex = "1.7"
+anyhow = "1"

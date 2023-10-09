@@ -11,12 +11,9 @@ impl MysqlQuick {
     /// ```
     /// let conn = MysqlQuick::new("mysql://root:12345678@localhost:3306/dev_db").unwrap();
     /// ```
-    pub fn new(url: &str) -> Result<MysqlQuick> {
-        let pool = Pool::new(url);
-        match pool {
-            Ok(p) => Ok(MysqlQuick { pool: p }),
-            Err(e) => Err(e),
-        }
+    pub fn new(url: &str) -> anyhow::Result<MysqlQuick> {
+        let pool = Pool::new(url)?;
+        Ok(MysqlQuick { pool })
     }
 }
 
@@ -32,12 +29,9 @@ impl MysqlQuick {
 /// ```
 ///
 ///
-pub fn my_run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
-    let temp_res = conn.query_drop(sql);
-    match temp_res {
-        Ok(_) => Ok(conn.last_insert_id()),
-        Err(e) => Err(e),
-    }
+pub fn my_run_drop(conn: &mut PooledConn, sql: String) -> anyhow::Result<u64> {
+    conn.query_drop(sql)?;
+    Ok(conn.last_insert_id())
 }
 
 /// 运行sql语句，返回想要的结果
@@ -52,19 +46,14 @@ pub fn my_run_drop(conn: &mut PooledConn, sql: String) -> Result<u64> {
 /// }
 /// let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql).unwrap();
 /// ```
-pub fn my_run_vec<U>(conn: &mut PooledConn, sql: String) -> Result<Vec<U>>
+pub fn my_run_vec<U>(conn: &mut PooledConn, sql: String) -> anyhow::Result<Vec<U>>
 where
     U: DeserializeOwned,
 {
     // let tmp_f: String = get_select_field(&sql);
-    let rows: Result<Vec<Row>> = conn.exec(sql, ());
-    match rows {
-        Ok(r) => {
-            let j_res: Vec<U> = rows_to_json(r);
-            Ok(j_res)
-        }
-        Err(e) => Err(e),
-    }
+    let rows: Vec<Row> = conn.exec(sql, ())?;
+    let j_res: Vec<U> = rows_to_json(rows)?;
+    Ok(j_res)
 }
 
 /// ### 事务执行
@@ -85,16 +74,11 @@ where
 /// ```
 ///
 ///
-pub fn my_run_tran_drop(tran: &mut Transaction, sql: String) -> Result<u64> {
-    let temp_tran = tran.query_drop(sql);
-    match temp_tran {
-        Ok(_) => {
-            let id = tran.last_insert_id();
-            let id = if let Some(i) = id { i } else { 0 };
-            Ok(id)
-        }
-        Err(e) => Err(e),
-    }
+pub fn my_run_tran_drop(tran: &mut Transaction, sql: String) -> anyhow::Result<u64> {
+    tran.query_drop(sql)?;
+    let id = tran.last_insert_id();
+    let id = if let Some(i) = id { i } else { 0 };
+    Ok(id)
 }
 
 /// ### 事务执行
@@ -111,18 +95,13 @@ pub fn my_run_tran_drop(tran: &mut Transaction, sql: String) -> Result<u64> {
 /// let res_get: Vec<Feedback> = my_run_tran_vec(&mut tran, sql1).unwrap();
 /// println!("get 结果 {:#?}", res_get);
 /// ```
-pub fn my_run_tran_vec<U>(tran: &mut Transaction, sql: String) -> Result<Vec<U>>
+pub fn my_run_tran_vec<U>(tran: &mut Transaction, sql: String) -> anyhow::Result<Vec<U>>
 where
     U: DeserializeOwned,
 {
-    let rows: Result<Vec<Row>> = tran.exec(sql, ());
-    match rows {
-        Ok(r) => {
-            let j_res: Vec<U> = rows_to_json(r);
-            Ok(j_res)
-        }
-        Err(e) => Err(e),
-    }
+    let rows: Vec<Row> = tran.exec(sql, ())?;
+    let j_res: Vec<U> = rows_to_json(rows)?;
+    Ok(j_res)
 }
 
 // fn is_json_string(s: &str) -> bool {
@@ -132,12 +111,12 @@ where
 //     }
 // }
 
-fn rows_to_json<U>(rows: Vec<Row>) -> Vec<U>
+fn rows_to_json<U>(rows: Vec<Row>) -> anyhow::Result<Vec<U>>
 where
     U: DeserializeOwned,
 {
     if rows.len() == 0 {
-        return vec![];
+        return Ok(vec![]);
     }
     let mut j_st = String::from("[");
     for row in rows.into_iter() {
@@ -146,7 +125,7 @@ where
             // Cells in a row can be indexed by numeric index or by column name
             let column_name = column.name_str().to_string();
             let column_value = &row[column.name_str().as_ref()];
-            let tmp = row_value_as_string(column_value);
+            let tmp = row_value_as_string(column_value)?;
             one = one + "\"" + column_name.as_str() + "\": " + tmp.as_str() + ",";
         }
         one.pop();
@@ -157,29 +136,55 @@ where
     j_st.pop();
     j_st.push(']');
     // println!("j_st>>>>>>>  {}\n", j_st);
-    let json_result: Vec<U> = serde_json::from_str(j_st.as_str()).unwrap();
-    json_result
+    let json_result: Vec<U> = serde_json::from_str(j_st.as_str())?;
+    Ok(json_result)
 }
-fn row_value_as_string(value: &Value) -> String {
+fn row_value_as_string(value: &Value) -> anyhow::Result<String> {
     match value {
-        Value::NULL => String::from("null"),
+        Value::NULL => Ok(String::from("null")),
         Value::Bytes(v) => {
             let mut info = String::from_utf8_lossy(v.as_slice())
                 .into_owned()
                 .to_string();
-            info = serde_json::to_string(&info).unwrap();
-            format!(r#"{info}"#)
+            info = serde_json::to_string(&info)?;
+            Ok(format!(r#"{info}"#))
         }
-        Value::Int(v) => format!("{v}"),
-        Value::UInt(v) => format!("{v}"),
-        Value::Float(v) => format!("{v}"),
-        Value::Double(v) => format!("{v}"),
+        Value::Int(v) => Ok(format!("{v}")),
+        Value::UInt(v) => Ok(format!("{v}")),
+        Value::Float(v) => Ok(format!("{v}")),
+        Value::Double(v) => Ok(format!("{v}")),
         Value::Date(year, month, day, hour, minutes, seconds, _micro) => {
-            format!("\"{year}-{month}-{day} {hour}:{minutes}:{seconds}\"")
+            let m = if month < &10 {
+                format!("0{month}")
+            } else {
+                format!("{month}")
+            };
+            let d = if day < &10 {
+                format!("0{day}")
+            } else {
+                format!("{day}")
+            };
+            let h = if hour < &10 {
+                format!("0{hour}")
+            } else {
+                format!("{hour}")
+            };
+            let min = if minutes < &10 {
+                format!("0{minutes}")
+            } else {
+                format!("{minutes}")
+            };
+            let s = if seconds < &10 {
+                format!("0{seconds}")
+            } else {
+                format!("{seconds}")
+            };
+
+            Ok(format!("\"{year}-{m}-{d} {h}:{min}:{s}\""))
         }
-        Value::Time(negative, days, hours, minutes, seconds, micro) => {
-            format!("\"{negative} {days} {hours}:{minutes}:{seconds}.{micro}\"")
-        }
+        Value::Time(negative, days, hours, minutes, seconds, micro) => Ok(format!(
+            "\"{negative} {days} {hours}:{minutes}:{seconds}.{micro}\""
+        )),
     }
 }
 

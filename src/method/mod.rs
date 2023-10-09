@@ -7,6 +7,9 @@ mod mycount;
 mod mydel;
 
 #[macro_use]
+mod mydelmany;
+
+#[macro_use]
 mod myfind;
 
 #[macro_use]
