@@ -1,12 +1,22 @@
 /// 新增数据 ，返回 sql 语句。
-/// 下面示例中，user 为表名，，name、num 为字段名，，后面为新增的值。
+///
 /// ```
-/// let sql = myset!("users", {
-///     "name": &string_t,
-///     "num": 882,
-///     "content": "null",   // null 表示该字段为NULL
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{myset, my_run_drop, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// # let info = r#"m'y,,a#@!@$$33^&^%&&#\\ \ \ \ \ \ \ \\\\\$,,adflll+_)"(_)*)(32389)d(ŐдŐ๑)🍉 .',"#;
+/// let sql = myset!("for_test", {
+///     "title": "set 新增",
+///     "content": info,
+///     "total": "null", // null 表示该字段为NULL
+///     "uid": 8,
+///     "price": 88.2,
 /// });
-/// my_run_drop(&mut conn, sql).unwrap();
+/// let id = my_run_drop(&mut conn, sql).unwrap();
+/// # if id <= 0 {
+/// #    return assert!(false);
+/// # }
 /// ```
 #[macro_export]
 macro_rules! myset {

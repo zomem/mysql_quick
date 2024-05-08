@@ -1,17 +1,22 @@
-/// 通过id，删除数据 ，返回 sql 语句。
+/// 1.通过id，删除数据，返回 sql 语句。
 /// ```
-/// let sql = mydel!("feedback", 2);  // where id = 2
-/// // 执行
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{mydel, my_run_drop, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// let sql = mydel!("for_test", 12);
 /// my_run_drop(&mut conn, sql).unwrap();
 ///
 /// ```
-/// 通过指定字段的值，删除数据 ，返回 sql 语句。
+/// 2.通过指定字段的值，删除全部数据，返回 sql 语句。
 /// ```
-/// // 删除 uid = 12 的数据
-/// let sql = mydel!("feedback", {"uid": 12});
-/// // 执行
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{mydel, my_run_drop, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// // 删除 uid = 5 的全部数据
+/// let sql = mydel!("for_test", {"uid": 5});
 /// my_run_drop(&mut conn, sql).unwrap();
-///
 /// ```
 #[macro_export]
 macro_rules! mydel {

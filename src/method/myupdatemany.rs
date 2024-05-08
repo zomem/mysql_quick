@@ -1,5 +1,10 @@
-/// 1.单个条件，批量更新数据 ，返回 sql 语句。
+/// 批量更新数据 ，返回 sql 语句。
 /// ```
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{myupdatemany, my_run_drop, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// # let info = r#"m'y,,a#@!@$$33^&^%&&#\\ \ \ \ \ \ \ \\\\\$,,adflll+_)"(_)*)(32389)d(ŐдŐ๑)🍉 .',"#;
 /// #[derive(Serialize, Deserialize)]
 /// struct Item {
 ///     id: u64,
@@ -7,43 +12,28 @@
 ///     total: u32,
 /// }
 /// let vec_data = vec![
-///     Item {id: 1, content: String::from("aaa"), total: 12},
-///     Item {id: 2, content: String::from("bb"), total: 1},
+///     Item {id: 1, content: "ABC".to_string(), total: 1},
+///     Item {id: 2, content: String::from("批量更新2111"), total: 1},
 /// ];
-/// let sql = myupdatemany!("content", "id", vec_data);
-/// // 当前以 id 字段为查寻条件，更新 id 分别为 1、2 的数据的content、total为对应的值。
+/// // 1.单个条件
+/// // 当前以 id 字段为查寻条件，更新 id 分别为1、2数据的content、total为对应的值。
+/// let sql = myupdatemany!("for_test", "id", vec_data);
+/// my_run_drop(&mut conn, sql).unwrap();
+///
+/// // 2.多个条件
+/// // 当前以 id && total 字段为查寻条件，更新满足 1 && 1 与 2 && 1 的数据content为对应的值。
+/// let sql = myupdatemany!("for_test", "id,total", vec_data);
+///
+/// // 3.对特定字段进行原子性批量更新数据
+/// // 如下，表示以 id 为查寻条件，total 字段要进行 incr 更新操作(注：total 不会作为查寻条件)。
+/// let sql = myupdatemany!("for_test", "id,+total", vec_data);
 /// ```
 ///
 ///
-/// 2.多个条件，更新数据，返回 sql 语句。
-/// ```
-/// #[derive(Serialize, Deserialize)]
-/// struct Item {
-///     name: String,
-///     content: String,
-///     total: u32,
-/// }
-/// let vec_data = vec![
-///     Item {name: "a", content: String::from("aaa"), total: 12},
-///     Item {name: "b", content: String::from("bb"), total: 1},
-/// ];
-/// let sql = myupdatemany!("content", "name,total", vec_data);
-/// // 当前以 name && total 字段为查寻条件，更新 name 和 total 分别为 "a" && 12 与 ”b“ && 1 的数据的content为对应的值。
-/// ```
-/// 3.对某个字段进行原子性更新，返回 sql 语句。
-/// ```
-/// // 要行进 incr 的更新的字段，用+号填写。
-/// // 如下，表示以name,total为查寻条件，price字段要进行incr更新操作(price 不会作为查寻条件)。
-/// let sql = myupdatemany!("content", "name,total,+price", vec_data);
-/// ```
 #[macro_export]
 macro_rules! myupdatemany {
     ($t:expr, $i:expr, $v: expr) => {{
-        // fn type_of<T>(_: T) -> &'static str {
-        //     std::any::type_name::<T>()
-        // }
         let i_info = $i.clone();
-
         let i_vec: Vec<String> = i_info
             .split(",")
             .into_iter()
@@ -69,27 +59,33 @@ macro_rules! myupdatemany {
         let mut select_vec: Vec<String> = vec![];
 
         for i in 0..$v.len() {
-            let mut item_str = serde_json::to_string(&$v[i]).unwrap();
-            item_str.pop();
-            item_str.remove(0);
-            item_str.push(',');
-            item_str.push('"');
-            item_str.insert(0, ',');
-            // ",\"content\":\"aaa\",\"total\":12,\"uid\":3,\"des\":\"nn\",\""
+            let item_str = serde_json::to_string(&$v[i]).unwrap();
+            let o: serde_json::Value = serde_json::from_str(&item_str).unwrap();
+
             // SELECT  1 AS id, 11 AS code, 'nam' AS name, 44 AS book
-            let mut field_list: Vec<String> = vec![];
+            let mut field_list: Vec<&str> = vec![];
             let mut select_item: Vec<String> = vec![];
 
-            let re = regex::Regex::new(",\"([0-9a-zA-Z_]+?)\":").unwrap();
-            for cap in re.captures_iter(item_str.as_str()) {
-                field_list.push((&cap[1]).to_string());
-            }
+            for key in o.as_object().unwrap().keys() {
+                if i == 0 {
+                    field_list.push(&key);
+                }
 
-            let re2 = regex::Regex::new("\":(.*?),\"").unwrap();
-            let mut n = 0;
-            for cap2 in re2.captures_iter(item_str.as_str()) {
-                select_item.push((&cap2[1]).to_string() + " AS " + field_list[n].as_str());
-                n = n + 1;
+                let temp_v = &o[key];
+                if (temp_v.is_number()) {
+                    select_item.push(temp_v.to_string() + " AS " + &key);
+                } else if temp_v.is_null() {
+                    select_item.push("NULL".to_owned() + " AS " + &key);
+                } else if temp_v.is_string() {
+                    let t_v = temp_v.as_str().unwrap();
+                    if t_v == "null" {
+                        select_item.push("NULL".to_owned() + " AS " + &key);
+                    } else {
+                        let mut v_r = t_v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        select_item.push("\"".to_string() + &v_r + "\"" + " AS " + &key);
+                    }
+                }
             }
 
             select_vec.push("SELECT ".to_string() + select_item.join(",").as_str());
@@ -100,7 +96,7 @@ macro_rules! myupdatemany {
                     .map(|x| {
                         let mut is_incr = false;
                         for c in 0..incr_field.len() {
-                            if incr_field[c].contains(x.as_str()) {
+                            if incr_field[c].contains(x) {
                                 is_incr = true;
                                 break;
                             }
@@ -108,23 +104,17 @@ macro_rules! myupdatemany {
                         if is_incr {
                             table.clone()
                                 + "."
-                                + x.as_str()
+                                + x
                                 + " = "
                                 + table.clone().as_str()
                                 + "."
-                                + x.as_str()
+                                + x
                                 + " + "
                                 + table_upmj.as_str()
                                 + "."
-                                + x.as_str()
+                                + x
                         } else {
-                            table.clone()
-                                + "."
-                                + x.as_str()
-                                + " = "
-                                + table_upmj.as_str()
-                                + "."
-                                + x.as_str()
+                            table.clone() + "." + x + " = " + table_upmj.as_str() + "." + x
                         }
                     })
                     .collect();

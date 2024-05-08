@@ -1,102 +1,62 @@
+///
 /// 批量新增数据 ，返回 sql 语句。
-/// 下面示例中，user 为表名，，name、num 为字段名，，后面为新增的值。
 ///
 /// ```
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{mysetmany, my_run_drop, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// # let info = r#"m'y,,a#@!@$$33^&^%&&#\\ \ \ \ \ \ \ \\\\\$,,adflll+_)"(_)*)(32389)d(ŐдŐ๑)🍉 .',"#;
 /// #[derive(Serialize, Deserialize)]
 /// struct Item {
 ///     content: String,
 ///     total: u32,
+///     price: Option<f32>,
 /// }
 /// let vec_data = vec![
-///     Item {content: String::from("aaa"), total: 12},
-///     Item {content: String::from("bb"), total: 1},
+///     Item {content: info.to_owned(), total: 10, price: Some(30.5)},
+///     Item {content: String::from("批量新增"), total: 11, price: None}, // "null" 也表示 NULL
 /// ];
-/// let sql = mysetmany!("content", vec_data);
+/// let sql = mysetmany!("for_test", vec_data);
+/// my_run_drop(&mut conn, sql).unwrap();
 /// ```
 #[macro_export]
 macro_rules! mysetmany {
-    // ($t:expr, [$({$($k:tt: $v:expr),+$(,)?}),+$(,)?]) => {
-    //     {
-    //         fn type_of<T>(_: T) -> &'static str {
-    //             std::any::type_name::<T>()
-    //         }
-    //         let mut keys = String::from("");
-    //         let mut values = String::from("");
-    //         $(
-    //             if keys == "".to_string() {
-    //                 $(
-    //                     keys = keys + $k + ",";
-    //                 )+
-    //             }
-    //             values = values + " ( ";
-    //             $(
-    //                 let temp_v = $v;
-    //                 let v_type = type_of(&temp_v);
-    //                 values = match v_type {
-    //                     "&&str" => {
-    //                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-    //                         v_r = v_r.replace("\"", "\\\"");
-    //                         values + "\"" + &v_r + "\","
-    //                     },
-    //                     "&alloc::string::String" => {
-    //                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-    //                         v_r = v_r.replace("\"", "\\\"");
-    //                         values + "\"" + &v_r + "\","
-    //                     },
-    //                     "&&alloc::string::String" => {
-    //                         let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-    //                         v_r = v_r.replace("\"", "\\\"");
-    //                         values + "\"" + &v_r + "\","
-    //                     },
-    //                     _ => {
-    //                         values + temp_v.to_string().as_str() + ","
-    //                     }
-    //                 };
-    //             )+
-    //             values.pop();
-    //             values = values + " ),";
-    //         )+
-
-    //         keys.pop();
-    //         values.pop();
-
-    //         let sql: String = "INSERT INTO ".to_string() + $t + " ( " + keys.as_str() + " ) "
-    //             + " VALUES " + values.as_str();
-
-    //         sql
-    //     }
-    // };
     ($t:expr, $v: expr) => {{
-        fn type_of<T>(_: T) -> &'static str {
-            std::any::type_name::<T>()
-        }
         let mut field_name = " (".to_string();
         let mut value = "".to_string();
         for i in 0..$v.len() {
-            let mut item_str = serde_json::to_string(&$v[i]).unwrap();
-            item_str.pop();
-            item_str.remove(0);
-            item_str.push(',');
-            item_str.push('"');
-            item_str.insert(0, ',');
-            // ",\"content\":\"aaa\",\"total\":12,\"uid\":3,\"des\":\"nn\",\""
+            let item_str = serde_json::to_string(&$v[i]).unwrap();
+            let o: serde_json::Value = serde_json::from_str(&item_str).unwrap();
             value = value + " (";
-            let re2 = regex::Regex::new("\":(.*?),\"").unwrap();
-            for cap2 in re2.captures_iter(item_str.as_str()) {
-                value = value + &cap2[1] + ",";
-            }
-            value.pop();
-            value = value + "),";
-
-            if i == 0 {
-                let re = regex::Regex::new(",\"([0-9a-zA-Z_]+?)\":").unwrap();
-                for cap in re.captures_iter(item_str.as_str()) {
-                    field_name = field_name + &cap[1] + ",";
+            for key in o.as_object().unwrap().keys() {
+                if i == 0 {
+                    field_name = field_name + &key + ",";
                 }
+                let temp_v = &o[key];
+                if (temp_v.is_number()) {
+                    value = value + temp_v.to_string().as_str() + ",";
+                } else if temp_v.is_null() {
+                    value = value + "NULL,";
+                } else if temp_v.is_string() {
+                    let t_v = temp_v.as_str().unwrap();
+                    if t_v == "null" {
+                        value = value + "NULL,";
+                    } else {
+                        let mut v_r = t_v.to_string().as_str().replace("\\", "\\\\");
+                        v_r = v_r.replace("\"", "\\\"");
+                        value = value + "\"" + &v_r + "\","
+                    }
+                }
+            }
+            if i == 0 {
                 field_name.pop();
                 field_name = field_name + ")";
             }
+            value.pop();
+            value = value + "),";
         }
+
         value.pop();
         let sql: String =
             "INSERT INTO ".to_string() + $t + field_name.as_str() + " VALUES" + value.as_str();

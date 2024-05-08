@@ -34,8 +34,8 @@ let data: Vec<serde_json::Value> = my_run_vec(&mut conn, sql).unwrap();
 |  sql快捷生成方法   | 说明  |
 |  ----  | ----  |
 | mycount  | 返回计数的sql |
-| mydelmany  | 批量删除数据的sql |
 | mydel  | 删除一条数据的sql |
+| mydelmany  | 批量删除数据的sql |
 | myfind  | 查寻数据的sql |
 | myget  | 查寻一条数据的sql |
 | myset  | 新增一条数据的sql |

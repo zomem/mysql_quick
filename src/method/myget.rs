@@ -1,20 +1,29 @@
-/// 获取一条数据，一定要记录传`select`的字段且不能为*
+/// 获取一条数据，返回 sql 语句
 ///
 /// ```
-/// 根据 id 查寻
-/// // 查寻 id =3 3 的数据
-/// let sql1 = myget!("feedback", 33, "id,content as cc");
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{myget, my_run_vec, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// // 1.根据id查寻一条数据
 /// #[derive(Serialize, Deserialize, Debug)]
-/// struct Feedback {
+/// struct Item {
 ///     id: u64,
 ///     cc: String
 /// }
-/// let res_get: Vec<Feedback> = my_run_vec(&mut conn, sql1).unwrap();
+/// let sql = myget!("for_test", 5, "id,content as cc"); // 查寻 id = 5 的数据
+/// let res_get: Vec<Item> = my_run_vec(&mut conn, sql).unwrap();
+/// # if res_get.len() != 1 {
+/// #    return assert!(false);
+/// # }
 ///
-/// 根据指定字段查寻
-/// // 查寻 uid = 32 的数据
-/// myget!("table", {"uid": 32}, "*")
-///
+/// // 2.根据指定字段的值查寻数据(满足条件的全部数据)
+/// # let info = r#"m'y,,a#@!@$$33^&^%&&#\\ \ \ \ \ \ \ \\\\\$,,adflll+_)"(_)*)(32389)d(ŐдŐ๑)🍉 .',"#;
+/// let sql = myget!("for_test", {"content": info}); // 查寻 content = info 的数据
+/// let res_get: Vec<serde_json::Value> = my_run_vec(&mut conn, sql).unwrap();
+/// # if res_get.len() < 1 {
+/// #    return assert!(false);
+/// # }
 /// ```
 ///
 #[macro_export]

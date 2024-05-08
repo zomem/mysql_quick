@@ -1,15 +1,36 @@
 /// 计数 ，返回 sql 语句，参数同 find 类似。
+///
+/// j*: 为 join 操作，【"字段1", "方法", "字段2"】
+/// 方法有：`inner、left、right`
+///
+/// p*: 为查寻操作，【"字段", "方法", "参数"】
+/// 方法有：`>、<、=、!=、<=、>=、like、in、not_in、is_null`
+///
+/// r: 为p的组合条件(必填)，如：`p0`、`p1 && (p0 || p2)`
+///
 /// ```
-/// use mysql_quick::MysqlQuickCount;
+/// # use serde::{Deserialize, Serialize};
+/// use mysql_quick::{mycount, my_run_vec, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
 ///
-/// let res_count: Vec<MysqlQuickCount> = my_run_vec(&mut conn, mycount!("feedback", {})).unwrap();
-///
-///
-/// // 条件计数
-/// mycount!(table, {
-///     p0: ["price", ">", 100],
-///     r: "p0"
+/// let sql = mycount!("for_test", {
+///     p0: ["total", ">", 0],
+///     r: "p0",
 /// });
+/// let res_count: Vec<MysqlQuickCount> = my_run_vec(&mut conn, sql).unwrap();
+///
+/// # if res_count[0].mysql_quick_count == 0 {
+/// #     return assert!(false);
+/// # }
+///
+/// // 其他用法
+/// let sql = mycount!("for_test", {
+///     p0: ["total", ">", 0],
+///     r: "p0",
+///     distinct: "title",
+/// });
+///
 /// ```
 #[macro_export]
 macro_rules! mycount {
@@ -29,6 +50,7 @@ macro_rules! mycount {
         $(p8: [$k8:tt, $m8:tt, $v8:expr],)?
         $(p9: [$k9:tt, $m9:tt, $v9:expr],)?
         $(r: $r:expr,)?
+        $(distinct: $distinct:expr,)?
     }) => {
         {
             fn _type_of<T>(_: T) -> &'static str {
@@ -78,7 +100,11 @@ macro_rules! mycount {
                 tmp_vs.join(",")
             }
             fn _get_p(k: &str, m: &str, v: &str, vty: &str, main_table_change: &str) -> String {
-                let tmp_v = match vty {
+                let mut tmp_v = v.to_string();
+                if m == "in" || m == "not_in" || m == "is_null" {
+
+                } else {
+                 tmp_v = match vty {
                     "&&str" => {
                         let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
@@ -98,6 +124,7 @@ macro_rules! mycount {
                         v.to_string() + ""
                     }
                 };
+                }
                 let k_re = _rename_field(k, main_table_change);
                 let p = match m {
                     ">" => k_re + " > " + tmp_v.as_str(),
@@ -326,7 +353,12 @@ macro_rules! mycount {
                 where_r = " WHERE ".to_string() + qq_all.as_str();
             }
 
-            let sql = "SELECT count(*) as mysql_quick_count".to_string() +
+            let mut _distinct = String::from("*");
+            $(
+                _distinct = format!("DISTINCT {}", $distinct);
+            )?
+
+            let sql = "SELECT count(".to_string() + _distinct.as_str() + ") as mysql_quick_count" +
                 " FROM " + $t +
                 _join.as_str() +
                 where_r.as_str();

@@ -1,29 +1,40 @@
 /// 1.通过id，更新数据 ，返回 sql 语句。
 /// ```
-/// let sql = myupdate!("feedback", 50, {
-///     "content": "这里有",
-///     "uid": 77,
-///     "des": "null",    // 表示更新该字段值为NULL
-/// })  // id = 50
-///
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{myupdate, my_run_drop, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// # let info = r#"m'y,,a#@!@$$33^&^%&&#\\ \ \ \ \ \ \ \\\\\$,,adflll+_)"(_)*)(32389)d(ŐдŐ๑)🍉 .',"#;
+/// let sql = myupdate!("for_test", 6, {
+///     "title": "更新操作",
+///     "content": info,
+///     "uid": 9,
+///     "price": "null",    // 表示更新该字段值为NULL
+/// });
 /// my_run_drop(&mut conn, sql).unwrap();
 ///
 /// // 原子更新，(如果使用[字段，值]的方式，都所有都需要使用这种形式)
-/// let sql2 = myupdate!("feedback", 50, {
-///     "content": ["set", "更新"],  // set 就是替换操作
-///     "uid": ["incr", -23],   // incr 原子性加减
-///     "des": ["unset", ""]   // unset 清空值
-/// })
+/// let sql = myupdate!("for_test", 7, {
+///     "title": ["set", "价格减10"],  // set 修改操作
+///     "price": ["incr", -10],   // incr 原子性加减
+///     "content": ["unset", ""],   // unset 清空值
+/// });
+/// my_run_drop(&mut conn, sql).unwrap();
 ///
 /// ```
 ///
 /// 2.通过指定字段的值，更新数据 ，返回 sql 语句。
 /// ```
-/// // uid = 12
-/// let sql = myupdate!("feedback", {"uid": 12}, {"name": "zh"});
-///
+/// # use serde::{Deserialize, Serialize};
+/// # use mysql_quick::{myupdate, my_run_drop, MysqlQuick, MysqlQuickCount};
+/// # const MYSQL_URL: &str = "mysql://root:12345678@localhost:3306/dev_db";
+/// # let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+/// let sql = myupdate!("for_test", {"uid": 3}, {"title": "更新了uid为3的数据"}); // 更新 uid = 3 的第一条数据
 /// my_run_drop(&mut conn, sql).unwrap();
 ///
+/// // 原子性更新
+/// let sql = myupdate!("for_test", {"uid": 3}, {"total": ["incr", 1]});
+/// my_run_drop(&mut conn, sql).unwrap();
 /// ```
 #[macro_export]
 macro_rules! myupdate {
