@@ -1,6 +1,9 @@
 mod method;
 pub use method::*;
 
+pub use regex::Regex;
+pub use serde_json::{from_str, to_string, Value};
+
 #[cfg(test)]
 mod test {
     use crate::{
