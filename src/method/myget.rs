@@ -47,9 +47,9 @@ macro_rules! myget {
                 }
                 tmp_name
             }
-            fn _get_select(s: &str, main_table_change: &str) -> String {
+            fn _get_select<T: Into<String> + std::fmt::Display>(s: T, main_table_change: &str) -> String {
                 let mut tmp_select = String::from("");
-                for v in s.split(",").collect::<Vec<&str>>().iter() {
+                for v in s.to_string().split(",").collect::<Vec<&str>>().iter() {
                     let tmpv = v.trim();
                     tmp_select = tmp_select + _rename_field(tmpv, main_table_change).as_str() + ",";
                 }
@@ -61,23 +61,22 @@ macro_rules! myget {
             let temp_v = $v;
             let v_type = _type_of(&temp_v);
             let values = match v_type {
-                "&&str" => {
+                "&&str" | "&alloc::string::String" | "&&alloc::string::String" => {
                     let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "&alloc::string::String" => {
-                    let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                    v_r = v_r.replace("\"", "\\\"");
-                    "\"".to_string() + &v_r + "\""
+                "&mysql_quick::method::method::Sql<&str>" |
+                "&mysql_quick::method::method::Sql<alloc::string::String>" => {
+                    temp_v.to_string().replace("Sql", "")
                 },
-                "&&alloc::string::String" => {
-                    let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                    v_r = v_r.replace("\"", "\\\"");
-                    "\"".to_string() + &v_r + "\""
+                "&u8" | "&u16" | "&u32" | "&u64" | "&usize" |
+                "&i8" | "&i16" | "&i32" | "&i64" | "&isize" |
+                "&f32" | "&f64" | "&bool" => {
+                    temp_v.to_string() + ""
                 },
                 _ => {
-                    temp_v.to_string() + ""
+                   "".to_string()
                 }
             };
             let _table_change = get_table($t);
@@ -87,9 +86,9 @@ macro_rules! myget {
                 _select = tmp_s.as_str();
             )?
 
-            let sql = "SELECT ".to_string() + _select +
+            let sql = "(SELECT ".to_string() + _select +
                 " FROM " + $t +
-                " WHERE " + keys.as_str() + "=" + values.as_str();
+                " WHERE " + keys.as_str() + "=" + values.as_str() + ")";
 
             sql
         }
@@ -113,9 +112,9 @@ macro_rules! myget {
                 }
                 tmp_name
             }
-            fn _get_select(s: &str, main_table_change: &str) -> String {
+            fn _get_select<T: Into<String> + std::fmt::Display>(s: T, main_table_change: &str) -> String {
                 let mut tmp_select = String::from("");
-                for v in s.split(",").collect::<Vec<&str>>().iter() {
+                for v in s.to_string().split(",").collect::<Vec<&str>>().iter() {
                     let tmpv = v.trim();
                     tmp_select = tmp_select + _rename_field(tmpv, main_table_change).as_str() + ",";
                 }
@@ -126,23 +125,22 @@ macro_rules! myget {
             let temp_v = $v;
             let v_type = _type_of(&temp_v);
             let values = match v_type {
-                "&&str" => {
+                "&&str" | "&alloc::string::String" | "&&alloc::string::String" => {
                     let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                     v_r = v_r.replace("\"", "\\\"");
                     "\"".to_string() + &v_r + "\""
                 },
-                "&alloc::string::String" => {
-                    let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                    v_r = v_r.replace("\"", "\\\"");
-                    "\"".to_string() + &v_r + "\""
+                "&mysql_quick::method::method::Sql<&str>" |
+                "&mysql_quick::method::method::Sql<alloc::string::String>" => {
+                    temp_v.to_string().replace("Sql", "")
                 },
-                "&&alloc::string::String" => {
-                    let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                    v_r = v_r.replace("\"", "\\\"");
-                    "\"".to_string() + &v_r + "\""
+                "&u8" | "&u16" | "&u32" | "&u64" | "&usize" |
+                "&i8" | "&i16" | "&i32" | "&i64" | "&isize" |
+                "&f32" | "&f64" | "&bool" => {
+                    temp_v.to_string() + ""
                 },
                 _ => {
-                    temp_v.to_string() + ""
+                   "".to_string()
                 }
             };
             let _table_change = get_table($t);
@@ -152,9 +150,9 @@ macro_rules! myget {
                 _select = tmp_s.as_str();
             )?
 
-            let sql = "SELECT ".to_string() + _select +
+            let sql = "(SELECT ".to_string() + _select +
                 " FROM " + $t +
-                " WHERE id=" + values.as_str();
+                " WHERE id=" + values.as_str() + ")";
 
             sql
         }

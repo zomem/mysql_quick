@@ -1,6 +1,18 @@
 use mysql::*;
 pub use mysql::{prelude::*, PooledConn, Transaction, TxOpts};
 use serde::de::DeserializeOwned;
+use std::fmt::Display;
+
+/// Sql(String)，会将 String 识别为 sql 语句，而不是参数值
+///
+/// 仅支持 myget mycount myfind
+#[derive(Debug)]
+pub struct Sql<T: Into<String>>(pub T);
+impl<T: Into<String> + Display> Display for Sql<T> {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        write!(fmt, "Sql({})", self.0)
+    }
+}
 
 pub struct MysqlQuick {
     pub pool: Pool,

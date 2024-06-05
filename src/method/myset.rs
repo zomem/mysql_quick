@@ -37,24 +37,19 @@ macro_rules! myset {
                     values = values + "NULL,";
                 } else {
                     values = match v_type {
-                        "&&str" => {
+                        "&&str" | "&alloc::string::String" | "&&alloc::string::String" => {
                             let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
                             v_r = v_r.replace("\"", "\\\"");
                             values + "\"" + &v_r + "\","
                         },
-                        "&alloc::string::String" => {
-                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                            v_r = v_r.replace("\"", "\\\"");
-                            values + "\"" + &v_r + "\","
-                        },
-                        "&&alloc::string::String" => {
-                            let mut v_r = temp_v.to_string().as_str().replace("\\", "\\\\");
-                            v_r = v_r.replace("\"", "\\\"");
-                            values + "\"" + &v_r + "\","
+                        "&u8" | "&u16" | "&u32" | "&u64" | "&usize" |
+                        "&i8" | "&i16" | "&i32" | "&i64" | "&isize" |
+                        "&f32" | "&f64" | "&bool" => {
+                            values + temp_v.to_string().as_str() + ","
                         },
                         _ => {
-                            values + temp_v.to_string().as_str() + ","
-                        }
+                           "".to_string()
+                        },
                     };
                 }
             )+
@@ -62,8 +57,8 @@ macro_rules! myset {
             keys.pop();
             values.pop();
 
-            let sql: String = "INSERT INTO ".to_string() + $t + " ( " + keys.as_str() + " ) "
-                + " VALUES ( " + values.as_str() + " )";
+            let sql: String = "(INSERT INTO ".to_string() + $t + " ( " + keys.as_str() + " ) "
+                + " VALUES ( " + values.as_str() + " ))";
 
             sql
         }

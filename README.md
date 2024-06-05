@@ -133,3 +133,30 @@ if tmp.len() == 0 {
 
 
 ```
+
+### 组合查寻
+通过 Sql 包裹
+```rust
+use mysql_quick::Sql;
+
+let sql1 = myfind!("hospital", {
+    p0: ["hospital_name", "like", "信息%"],
+    r: "p0",
+    select: "hospitalId",
+});
+let sql2 = mycount!("patient", {
+    p0: ["investigation_id", "=", Sql("investigation.investigation_id")],
+    r: "p0",
+});
+
+let sql = myfind!("investigation", {
+    j1: ["hospital_id", "inner", "hospital.hospital_id"],
+    p0: ["hospital_id", "in", Sql(sql1)],
+    p1: ["inv_type", "=", "门诊"],
+    r: "p0 && p1",
+    select: "investigation_id, hospital_id,".to_string()
+        + sql2.as_str() + " as patient_count",
+});
+
+println!("sql>>>>>  {} \n", sql);
+```

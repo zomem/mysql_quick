@@ -88,23 +88,18 @@ macro_rules! mydelmany {
 
                 } else {
                     tmp_v = match vty {
-                        "&&str" => {
+                        "&&str" | "&alloc::string::String" | "&&alloc::string::String" => {
                             let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
                             v_r = v_r.replace("\"", "\\\"");
                             "\"".to_string() + &v_r + "\""
                         },
-                        "&alloc::string::String" => {
-                            let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
-                            v_r = v_r.replace("\"", "\\\"");
-                            "\"".to_string() + &v_r + "\""
-                        },
-                        "&&alloc::string::String" => {
-                            let mut v_r = v.to_string().as_str().replace("\\", "\\\\");
-                            v_r = v_r.replace("\"", "\\\"");
-                            "\"".to_string() + &v_r + "\""
+                        "&u8" | "&u16" | "&u32" | "&u64" | "&usize" |
+                        "&i8" | "&i16" | "&i32" | "&i64" | "&isize" |
+                        "&f32" | "&f64" | "&bool" => {
+                            v.to_string() + ""
                         },
                         _ => {
-                            v.to_string() + ""
+                            "".to_string()
                         }
                     };
                 }
@@ -315,9 +310,9 @@ macro_rules! mydelmany {
                 where_r = " WHERE ".to_string() + qq_all.as_str();
             }
 
-            let sql = "DELETE ".to_string() +
+            let sql = "(DELETE ".to_string() +
                 "FROM " + $t +
-                where_r.as_str();
+                where_r.as_str() + ")";
 
             sql
         }

@@ -8,6 +8,7 @@ pub use serde_json::{from_str, to_string, Value};
 mod test {
     use crate::{
         my_run_vec, mycount, myfind, myget, mysetmany, myupdatemany, MysqlQuick, MysqlQuickCount,
+        Sql,
     };
     use serde::{Deserialize, Serialize};
 
@@ -91,5 +92,37 @@ mod test {
         println!("sql》》》{}", sql);
 
         assert!(true)
+    }
+
+    #[test]
+    fn test_complex() {
+        let sql1 = myfind!("Hospital", {
+            p0: ["HospitalName", "like", "青岛市妇女儿童医院%"],
+            r: "p0",
+            select: "HospitalId",
+        });
+
+        let sql2 = mycount!("Patient", {
+            p0: ["InvestigationId", "=", Sql("Investigation.InvestigationId")],
+            r: "p0",
+        });
+        let sql3 = mycount!("DeletePatient", {
+            p0: ["InvestigationId", "=", Sql("Investigation.InvestigationId")],
+            r: "p0",
+        });
+
+        println!("33>>>>>  {} \n", sql2);
+
+        let sql = myfind!("Investigation", {
+            j1: ["HospitalId", "inner", "Hospital.HospitalId"],
+            p0: ["HospitalId", "in", Sql(sql1)],
+            p1: ["InvType", "=", "门诊"],
+            r: "p0 && p1",
+            select: "InvestigationId, HospitalId, Hospital.HospitalName, StatusOpDateTime, ".to_string()
+                + sql2.as_str() + "as patient_count, "
+                + sql3.as_str() + "as delete_patient_count",
+        });
+
+        println!("sql>>>>>  {} \n", sql);
     }
 }
