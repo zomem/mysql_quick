@@ -497,7 +497,7 @@ macro_rules! myfind {
                 _group_order_by = _get_order_by($group_order_by, _table_change);
             )?
 
-            let sql = "(SELECT ".to_string() + _select +
+            let sql = "SELECT ".to_string() + _select +
                 " FROM " + $t +
                 _join.as_str() +
                 where_r.as_str() +
@@ -505,8 +505,7 @@ macro_rules! myfind {
                 _limit_page.as_str() +
                 _group.as_str() +
                 _have.as_str() +
-                _group_order_by.as_str() +
-                ")";
+                _group_order_by.as_str();
 
             sql
         }

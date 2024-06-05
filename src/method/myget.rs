@@ -86,9 +86,9 @@ macro_rules! myget {
                 _select = tmp_s.as_str();
             )?
 
-            let sql = "(SELECT ".to_string() + _select +
+            let sql = "SELECT ".to_string() + _select +
                 " FROM " + $t +
-                " WHERE " + keys.as_str() + "=" + values.as_str() + ")";
+                " WHERE " + keys.as_str() + "=" + values.as_str();
 
             sql
         }
@@ -150,9 +150,9 @@ macro_rules! myget {
                 _select = tmp_s.as_str();
             )?
 
-            let sql = "(SELECT ".to_string() + _select +
+            let sql = "SELECT ".to_string() + _select +
                 " FROM " + $t +
-                " WHERE id=" + values.as_str() + ")";
+                " WHERE id=" + values.as_str();
 
             sql
         }

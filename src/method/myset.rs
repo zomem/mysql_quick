@@ -57,8 +57,8 @@ macro_rules! myset {
             keys.pop();
             values.pop();
 
-            let sql: String = "(INSERT INTO ".to_string() + $t + " ( " + keys.as_str() + " ) "
-                + " VALUES ( " + values.as_str() + " ))";
+            let sql: String = "INSERT INTO ".to_string() + $t + " ( " + keys.as_str() + " ) "
+                + " VALUES ( " + values.as_str() + " )";
 
             sql
         }

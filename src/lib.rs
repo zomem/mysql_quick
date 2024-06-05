@@ -7,8 +7,8 @@ pub use serde_json::{from_str, to_string, Value};
 #[cfg(test)]
 mod test {
     use crate::{
-        my_run_vec, mycount, myfind, myget, mysetmany, myupdatemany, MysqlQuick, MysqlQuickCount,
-        Sql,
+        my_run_vec, mycount, mydel, myfind, myget, mysetmany, myupdatemany, MysqlQuick,
+        MysqlQuickCount, Sql,
     };
     use serde::{Deserialize, Serialize};
 
@@ -17,6 +17,8 @@ mod test {
     #[test]
     fn test_one() {
         let mut conn = MysqlQuick::new(MYSQL_URL).unwrap().pool.get_conn().unwrap();
+        let sql = mydel!("for_test", 12);
+        println!("sql》》》{:?}", sql);
 
         let sql = mycount!("for_test", {
             p0: ["total", ">", 0],
@@ -96,33 +98,33 @@ mod test {
 
     #[test]
     fn test_complex() {
-        let sql1 = myfind!("Hospital", {
-            p0: ["HospitalName", "like", "青岛市妇女儿童医院%"],
+        let sql1 = myfind!("hospital", {
+            p0: ["hospital_name", "like", "院%"],
             r: "p0",
-            select: "HospitalId",
+            select: "hospital_id",
         });
-
-        let sql2 = mycount!("Patient", {
-            p0: ["InvestigationId", "=", Sql("Investigation.InvestigationId")],
-            r: "p0",
-        });
-        let sql3 = mycount!("DeletePatient", {
-            p0: ["InvestigationId", "=", Sql("Investigation.InvestigationId")],
+        let sql2 = mycount!("patient", {
+            p0: ["investigation_id", "=", Sql("investigation.investigation_id")],
             r: "p0",
         });
-
-        println!("33>>>>>  {} \n", sql2);
-
-        let sql = myfind!("Investigation", {
-            j1: ["HospitalId", "inner", "Hospital.HospitalId"],
-            p0: ["HospitalId", "in", Sql(sql1)],
-            p1: ["InvType", "=", "门诊"],
+        let sql3 = mycount!("delete_patient", {
+            p0: ["investigation_id", "=", Sql("investigation.investigation_id")],
+            r: "p0",
+        });
+        let sql = myfind!("investigation", {
+            j1: ["hospital_id", "inner", "hospital.hospital_id"],
+            p0: ["hospital_id", "in", Sql(sql1)],
+            p1: ["inv_type", "=", "门诊"],
             r: "p0 && p1",
-            select: "InvestigationId, HospitalId, Hospital.HospitalName, StatusOpDateTime, ".to_string()
-                + sql2.as_str() + "as patient_count, "
-                + sql3.as_str() + "as delete_patient_count",
+            select: "investigation_id, hospital_id, hospital.hospital_name, status_op_dateTime, (".to_string()
+                + sql2.as_str() + ") as patient_count, ("
+                + sql3.as_str() + ") as delete_patient_count",
         });
-
         println!("sql>>>>>  {} \n", sql);
+
+        assert_eq!(
+            sql,
+            r#"SELECT investigation.investigation_id,investigation.hospital_id,hospital.hospital_name,investigation.status_op_dateTime,(SELECT count(*) as mysql_quick_count FROM patient WHERE patient.investigation_id = (investigation.investigation_id)) as patient_count,(SELECT count(*) as mysql_quick_count FROM delete_patient WHERE delete_patient.investigation_id = (investigation.investigation_id)) as delete_patient_count FROM investigation INNER JOIN hospital ON investigation.hospital_id = hospital.hospital_id WHERE (investigation.hospital_id IN (SELECT hospital.hospital_id FROM hospital WHERE hospital.hospital_name LIKE "院%" ) AND investigation.inv_type = "门诊") "#
+        );
     }
 }

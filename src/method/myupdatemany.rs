@@ -121,7 +121,7 @@ macro_rules! myupdatemany {
             }
         }
 
-        let sql: String = "(UPDATE ".to_string()
+        let sql: String = "UPDATE ".to_string()
             + $t
             + " JOIN( "
             + select_vec.join(" UNION ").as_str()
@@ -130,8 +130,7 @@ macro_rules! myupdatemany {
             + " USING("
             + i_data.as_str()
             + ") SET "
-            + field_equl.join(", ").as_str()
-            + ")";
+            + field_equl.join(", ").as_str();
 
         sql
     }};

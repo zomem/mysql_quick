@@ -58,12 +58,8 @@ macro_rules! mysetmany {
         }
 
         value.pop();
-        let sql: String = "(INSERT INTO ".to_string()
-            + $t
-            + field_name.as_str()
-            + " VALUES"
-            + value.as_str()
-            + ")";
+        let sql: String =
+            "INSERT INTO ".to_string() + $t + field_name.as_str() + " VALUES" + value.as_str();
 
         sql
     }};
