@@ -98,6 +98,20 @@ mod test {
 
     #[test]
     fn test_complex() {
+        let sql = myfind!("for_test", {
+            j0: ["user_id", "inner", "dev.users.id as u"],
+            p0: ["content", "=", "内容"],
+            p1: ["uid", "=", "1"],
+            r: "p0 && p1",
+        });
+        println!("@@@ _1__ {}", sql);
+        let sql = myfind!("for_test", {
+            p0: ["content", "=", r#"' OR '1'='1'; --"#],
+            p1: ["uid", "=", "1"],
+            r: "p0 && p1",
+        });
+        println!("@@@ _2__ {}", sql);
+
         let sql1 = myfind!("hospital", {
             p0: ["hospital_name", "like", "院%"],
             r: "p0",

@@ -67,7 +67,8 @@ macro_rules! myget {
                     "\"".to_string() + &v_r + "\""
                 },
                 "&mysql_quick::method::method::Sql<&str>" |
-                "&mysql_quick::method::method::Sql<alloc::string::String>" => {
+                "&mysql_quick::method::method::Sql<alloc::string::String>" |
+                "&mysql_quick::method::method::Sql<&alloc::string::String>" => {
                     temp_v.to_string().replace("Sql", "")
                 },
                 "&u8" | "&u16" | "&u32" | "&u64" | "&usize" |
@@ -131,7 +132,8 @@ macro_rules! myget {
                     "\"".to_string() + &v_r + "\""
                 },
                 "&mysql_quick::method::method::Sql<&str>" |
-                "&mysql_quick::method::method::Sql<alloc::string::String>" => {
+                "&mysql_quick::method::method::Sql<alloc::string::String>" |
+                "&mysql_quick::method::method::Sql<&alloc::string::String>" => {
                     temp_v.to_string().replace("Sql", "")
                 },
                 "&u8" | "&u16" | "&u32" | "&u64" | "&usize" |
