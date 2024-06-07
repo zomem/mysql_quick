@@ -26,7 +26,7 @@
 /// // 示例
 /// myfind!("feedback as fb", { // 重命名用 as 操作
 ///     j0: ["uid", "inner", "users.id"],
-///     j1: ["uid", "inner", "users as u2.id"], // 对表重命名
+///     j1: ["uid", "inner", "users.id as u2"], // 对表重命名
 ///     j2: ["book_id", "left", "book.id"],
 ///     j3: ["book.uid", "right", "users.id"],
 ///     p0: ["num", ">", 0],

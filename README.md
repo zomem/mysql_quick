@@ -144,7 +144,7 @@ let sql1 = myfind!("hospital", {
     r: "p0",
     select: "hospital_id",
 });
-let sql2 = mycount!("patient", {
+let sql2 = mycount!("database.patient", { // 对其他库的表查寻
     p0: ["investigation_id", "=", Sql("investigation.investigation_id")],
     r: "p0",
 });
@@ -155,7 +155,7 @@ let sql = myfind!("investigation", {
     p1: ["inv_type", "=", "门诊"],
     r: "p0 && p1",
     select: "investigation_id, hospital_id, (".to_string()
-        + sql2.as_str() + ") as patient_count",
+        + sql2.as_str() + ") as patient_count", // 如果自己写sql语句，要注意sql注入
 });
 
 println!("sql>>>>>  {} \n", sql);
