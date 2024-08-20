@@ -39,3 +39,46 @@ pub const MY_EXCLUSIVE_LOCK: &str = " FOR UPDATE";
 pub struct MysqlQuickCount {
     pub mysql_quick_count: u64,
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test_myset() {
+        let name = Some("a");
+        let name2: Option<String> = None;
+        let aa = r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(_)*)(32389)"#;
+        let sql = myset!("table", {
+           "id": 23,
+           "nick": aa,
+           "name": name,
+           "name2": name2,
+           "age": Some(33),
+           "empty": Some(""),
+           "empty2": "",
+        });
+        assert_eq!(
+            r#"INSERT INTO table ( id,nick,name,name2,age,empty,empty2 )  VALUES ( 23,"m'y,,a#@!@$$^&^%&&#$,,adflll+_)\\\"(_)*)(32389)","a",NULL,33,"","" )"#,
+            sql
+        )
+    }
+    #[test]
+    fn test_myupdate() {
+        let name = Some("a");
+        let name2: Option<String> = None;
+        let aa = r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(_)*)(32389)"#;
+        let sql = myupdate!("table", 32, {
+           "id": 23,
+           "nick": aa,
+           "name": name,
+           "name2": name2,
+           "age": Some(33),
+           "empty": Some(""),
+           "empty2": "",
+        });
+        println!("{}", sql);
+        assert_eq!(
+            r#"UPDATE table SET id=23,nick="m'y,,a#@!@$$^&^%&&#$,,adflll+_)\\\"(_)*)(32389)",name="a",name2=NULL,age=33,empty="",empty2="" WHERE id=32"#,
+            sql
+        )
+    }
+}

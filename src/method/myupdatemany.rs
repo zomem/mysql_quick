@@ -9,11 +9,11 @@
 /// struct Item {
 ///     id: u64,
 ///     content: String,
-///     total: u32,
+///     total: Option<u32>,
 /// }
 /// let vec_data = vec![
-///     Item {id: 1, content: "ABC".to_string(), total: 1},
-///     Item {id: 2, content: String::from("批量更新2111"), total: 1},
+///     Item {id: 1, content: "ABC".to_string(), total: Some(1)},
+///     Item {id: 2, content: String::from("批量更新2111"), total: None},
 /// ];
 /// // 1.单个条件
 /// // 当前以 id 字段为查寻条件，更新 id 分别为1、2数据的content、total为对应的值。

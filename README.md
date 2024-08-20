@@ -52,7 +52,7 @@ let data: Vec<serde_json::Value> = my_run_vec(&mut conn, sql).unwrap();
 let id = my_run_drop(&mut conn, myset!("for_test", {
     "content": "ADFaadf",
     "uid": 9,
-    "info": if let Some(a) = one_info {a} else {"null"},
+    "info": Some('a'),
 })).unwrap();
 
 // 删除一条数据
@@ -60,7 +60,8 @@ my_run_drop(&mut conn, mydel!("for_test", 50)).unwrap();
 
 // 更新一条数据
 my_run_drop(&mut conn, myupdate!("for_test", 56, {
-    "content": "更新后的内容，一一一一"
+    "content": "更新后的内容",
+    "tatol": Some(200),
 })).unwrap();
 
 // 批量 新增数据
