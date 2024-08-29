@@ -7,7 +7,7 @@ pub use serde_json::{from_str, to_string, Value};
 #[cfg(test)]
 mod test {
     use crate::{
-        my_run_vec, mycount, mydel, myfind, myget, mysetmany, myupdatemany, MysqlQuick,
+        my_run_vec, mycount, mydel, myfind, myget, myset, mysetmany, myupdatemany, MysqlQuick,
         MysqlQuickCount, Sql,
     };
     use serde::{Deserialize, Serialize};
@@ -140,5 +140,29 @@ mod test {
             sql,
             r#"SELECT investigation.investigation_id,investigation.hospital_id,hospital.hospital_name,investigation.status_op_dateTime,(SELECT count(*) as mysql_quick_count FROM patient WHERE patient.investigation_id = (investigation.investigation_id)) as patient_count,(SELECT count(*) as mysql_quick_count FROM delete_patient WHERE delete_patient.investigation_id = (investigation.investigation_id)) as delete_patient_count FROM investigation INNER JOIN hospital ON investigation.hospital_id = hospital.hospital_id WHERE (investigation.hospital_id IN (SELECT hospital.hospital_id FROM hospital WHERE hospital.hospital_name LIKE "院%" ) AND investigation.inv_type = "门诊") "#
         );
+    }
+
+    #[test]
+    fn test_set() {
+        let sql = myset!("for_test", {
+            "name":  "wzj" ,
+            "age":  32,
+            "name": &Some("wzj"),
+            "age": &Some(32),
+        });
+        println!("@@@ _1__ {}", sql);
+
+        // #[derive(Debug)]
+        // struct Userbc {
+        //     phone: String,
+        //     c: u32,
+        // }
+        // let sql = myset!("for_test", {
+        //     "name": Some(Userbc{phone: "select".to_owned(), c: 3}),
+        //     "age": Some((32,"select")),
+        // });
+        // INSERT INTO for_test ( name,age )  VALUES ( "serbc { phone: \"select\", c: 3 ",(32, "select") )
+        // INSERT INTO for_test ( name,age )  VALUES ( "serbc { phone: \"select\", c: 3 ","32, \"select\"" )
+        println!("@@@ 11111__ {}", sql);
     }
 }
