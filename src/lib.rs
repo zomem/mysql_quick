@@ -7,8 +7,8 @@ pub use serde_json::{from_str, to_string, Value};
 #[cfg(test)]
 mod test {
     use crate::{
-        my_run_vec, mycount, mydel, myfind, myget, myset, mysetmany, myupdatemany, MysqlQuick,
-        MysqlQuickCount, Sql,
+        my_run_vec, mycount, mydel, myfind, myget, myset, mysetmany, myupdate, myupdatemany,
+        MysqlQuick, MysqlQuickCount, Sql,
     };
     use serde::{Deserialize, Serialize};
 
@@ -164,5 +164,11 @@ mod test {
         // INSERT INTO for_test ( name,age )  VALUES ( "serbc { phone: \"select\", c: 3 ",(32, "select") )
         // INSERT INTO for_test ( name,age )  VALUES ( "serbc { phone: \"select\", c: 3 ","32, \"select\"" )
         println!("@@@ 11111__ {}", sql);
+
+        let s = 2;
+        let sql = myupdate!("sku_unit", {"unit_sn": 100000}, {
+            "status": &s
+        });
+        println!("{}", sql);
     }
 }

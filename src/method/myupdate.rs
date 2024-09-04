@@ -54,6 +54,11 @@ macro_rules! myupdate {
                     "&f32" | "&f64" | "&f128" | "&bool" => {
                         t
                     },
+                    "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                    "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                    "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
+                        t
+                    },
                     "&core::option::Option<&str>" |
                     "&core::option::Option<alloc::string::String>" |
                     "&core::option::Option<&alloc::string::String>" => {
@@ -160,6 +165,11 @@ macro_rules! myupdate {
                         "&u8" | "&u16" | "&u32" | "&u64" | "&u128" | "&usize" |
                         "&i8" | "&i16" | "&i32" | "&i64" | "&i128" | "&isize" |
                         "&f32" | "&f64" | "&f128" | "&bool" => {
+                            temp_v + ","
+                        },
+                        "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                        "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                        "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
                             temp_v + ","
                         },
                         _ => {
@@ -208,6 +218,11 @@ macro_rules! myupdate {
                     "&f32" | "&f64" | "&f128" | "&bool" => {
                         t
                     },
+                    "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                    "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                    "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
+                        t
+                    },
                     "&core::option::Option<&str>" |
                     "&core::option::Option<alloc::string::String>" |
                     "&core::option::Option<&alloc::string::String>" => {
@@ -316,6 +331,11 @@ macro_rules! myupdate {
                         "&f32" | "&f64" | "&f128" | "&bool" => {
                             temp_v + ","
                         },
+                        "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                        "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                        "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
+                            temp_v + ","
+                        },
                         _ => {
                            "".to_string()
                         },
@@ -347,6 +367,11 @@ macro_rules! myupdate {
                     "&u8" | "&u16" | "&u32" | "&u64" | "&u128" | "&usize" |
                     "&i8" | "&i16" | "&i32" | "&i64" | "&i128" | "&isize" |
                     "&f32" | "&f64" | "&f128" | "&bool" => {
+                        t
+                    },
+                    "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                    "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                    "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
                         t
                     },
                     "&core::option::Option<&str>" |
@@ -456,6 +481,11 @@ macro_rules! myupdate {
                         "&f32" | "&f64" | "&f128" | "&bool" => {
                             temp_v + ","
                         },
+                        "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                        "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                        "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
+                            temp_v + ","
+                        },
                         _ => {
                            "".to_string()
                         },
@@ -499,6 +529,11 @@ macro_rules! myupdate {
                     "&u8" | "&u16" | "&u32" | "&u64" | "&u128" | "&usize" |
                     "&i8" | "&i16" | "&i32" | "&i64" | "&i128" | "&isize" |
                     "&f32" | "&f64" | "&f128" | "&bool" => {
+                        t
+                    },
+                    "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                    "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                    "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
                         t
                     },
                     "&core::option::Option<&str>" |
@@ -606,6 +641,11 @@ macro_rules! myupdate {
                         "&u8" | "&u16" | "&u32" | "&u64" | "&u128" | "&usize" |
                         "&i8" | "&i16" | "&i32" | "&i64" | "&i128" | "&isize" |
                         "&f32" | "&f64" | "&f128" | "&bool" => {
+                            temp_v + ","
+                        },
+                        "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                        "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                        "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
                             temp_v + ","
                         },
                         _ => {
