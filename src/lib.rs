@@ -170,5 +170,12 @@ mod test {
             "status": &s
         });
         println!("{}", sql);
+
+        let sql = myset!("talbe", {
+           "name": r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(\_)*)(32389)d(ŐдŐ๑)🍉 .',"#,
+           "b": Some(r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(\_)*)(32389)d(ŐдŐ๑)🍉 .',"#),
+           "cb": "null",
+        });
+        println!("sql,,,  {}", sql);
     }
 }

@@ -46,7 +46,7 @@ mod test {
     fn test_myset() {
         let name = Some("a");
         let name2: Option<String> = None;
-        let aa = r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(_)*)(32389)"#;
+        let aa = r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(\_)*)(32389)d(ŐдŐ๑)🍉 .',""#;
         let sql = myset!("table", {
            "id": 23,
            "nick": aa,
@@ -55,9 +55,11 @@ mod test {
            "age": Some(33),
            "empty": Some(""),
            "empty2": "",
+           "aa": &aa,
+           "aa2": &Some(aa),
         });
         assert_eq!(
-            r#"INSERT INTO table ( id,nick,name,name2,age,empty,empty2 )  VALUES ( 23,"m'y,,a#@!@$$^&^%&&#$,,adflll+_)\\\"(_)*)(32389)","a",NULL,33,"","" )"#,
+            r#"INSERT INTO table ( id,nick,name,name2,age,empty,empty2,aa,aa2 )  VALUES ( 23,"m'y,,a#@!@$$^&^%&&#$,,adflll+_)\"(\\_)*)(32389)d(ŐдŐ๑)🍉 .',\"","a",NULL,33,"","","m'y,,a#@!@$$^&^%&&#$,,adflll+_)\"(\\_)*)(32389)d(ŐдŐ๑)🍉 .',\"","m'y,,a#@!@$$^&^%&&#$,,adflll+_)\"(\\_)*)(32389)d(ŐдŐ๑)🍉 .',\"" )"#,
             sql
         )
     }
@@ -65,7 +67,7 @@ mod test {
     fn test_myupdate() {
         let name = Some("a");
         let name2: Option<String> = None;
-        let aa = r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(_)*)(32389)"#;
+        let aa = r#"m'y,,a#@!@$$^&^%&&#$,,adflll+_)"(_)*)(32389)d(ŐдŐ๑)🍉 .',""#;
         let sql = myupdate!("table", 32, {
            "id": 23,
            "nick": aa,
@@ -74,10 +76,12 @@ mod test {
            "age": Some(33),
            "empty": Some(""),
            "empty2": "",
+           "aa": &aa,
+           "aa2": &Some(aa),
         });
-        println!("{}", sql);
+        println!(",,,,,,,,,,  {}", sql);
         assert_eq!(
-            r#"UPDATE table SET id=23,nick="m'y,,a#@!@$$^&^%&&#$,,adflll+_)\\\"(_)*)(32389)",name="a",name2=NULL,age=33,empty="",empty2="" WHERE id=32"#,
+            r#"UPDATE table SET id=23,nick="m'y,,a#@!@$$^&^%&&#$,,adflll+_)\"(_)*)(32389)d(ŐдŐ๑)🍉 .',\"",name="a",name2=NULL,age=33,empty="",empty2="",aa="m'y,,a#@!@$$^&^%&&#$,,adflll+_)\"(_)*)(32389)d(ŐдŐ๑)🍉 .',\"",aa2="m'y,,a#@!@$$^&^%&&#$,,adflll+_)\"(_)*)(32389)d(ŐдŐ๑)🍉 .',\"" WHERE id=32"#,
             sql
         )
     }

@@ -115,16 +115,16 @@ macro_rules! myset {
                     temp_v = format!("{:?}", temp_op);
                     v_type = get_v_type(op_v_type)
                 }
-                if temp_v.as_str() == "null" {
+                if temp_v.as_str() == "null" || temp_v.as_str() == "\"null\"" {
                     values = values + "NULL,";
                 } else {
                     values = match v_type {
                         "&&str" | "&alloc::string::String" | "&&alloc::string::String" => {
                             temp_v.remove(0);
                             temp_v.pop();
-                            let mut v_r = temp_v.as_str().replace("\\", "\\\\");
-                            v_r = v_r.replace("\"", "\\\"");
-                            values + "\"" + &v_r + "\","
+                            // let mut v_r = temp_v.as_str().replace("\\", "\\\\");
+                            // v_r = v_r.replace("\"", "\\\"");
+                            values + "\"" + &temp_v + "\","
                         },
                         "&u8" | "&u16" | "&u32" | "&u64" | "&u128" | "&usize" |
                         "&i8" | "&i16" | "&i32" | "&i64" | "&i128" | "&isize" |
