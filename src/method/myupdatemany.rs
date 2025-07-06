@@ -12,8 +12,16 @@
 ///     total: Option<u32>,
 /// }
 /// let vec_data = vec![
-///     Item {id: 1, content: "ABC".to_string(), total: Some(1)},
-///     Item {id: 2, content: String::from("批量更新2111"), total: None},
+///     Item {
+///         id: 2,
+///         content: "null", // 更新值为 NULL
+///         total: None, // 忽略该字段
+///     },
+///     Item {
+///         id: 1,
+///         content: "ABC",
+///         total: Some(1),
+///     },
 /// ];
 /// // 1.单个条件
 /// // 当前以 id 字段为查寻条件，更新 id 分别为1、2数据的content、total为对应的值。
@@ -79,7 +87,7 @@ macro_rules! myupdatemany {
                 } else if temp_v.is_string() {
                     let t_v = temp_v.as_str().unwrap();
                     if t_v == "null" {
-                        select_item.push("NULL".to_owned() + " AS " + &key);
+                        select_item.push("\"null\"".to_owned() + " AS " + &key);
                     } else {
                         let mut v_r = t_v.to_string().as_str().replace("\\", "\\\\");
                         v_r = v_r.replace("\"", "\\\"");
@@ -101,20 +109,34 @@ macro_rules! myupdatemany {
                                 break;
                             }
                         }
+                        let field = table.clone() + "." + x;
+                        let field_upmj = table_upmj.clone() + "." + x;
                         if is_incr {
-                            table.clone()
-                                + "."
-                                + x
-                                + " = "
-                                + table.clone().as_str()
-                                + "."
-                                + x
+                            field.clone()
+                                + " = CASE WHEN "
+                                + &field_upmj
+                                + " IS NULL THEN "
+                                + &field
+                                + " WHEN CAST("
+                                + &field_upmj
+                                + " AS CHAR) = 'null' THEN NULL "
+                                + " ELSE "
+                                + &field
                                 + " + "
-                                + table_upmj.as_str()
-                                + "."
-                                + x
+                                + &field_upmj
+                                + " END"
                         } else {
-                            table.clone() + "." + x + " = " + table_upmj.as_str() + "." + x
+                            field.clone()
+                                + " = CASE WHEN "
+                                + &field_upmj
+                                + " IS NULL THEN "
+                                + &field
+                                + " WHEN CAST("
+                                + &field_upmj
+                                + " AS CHAR) = 'null' THEN NULL "
+                                + " ELSE "
+                                + &field_upmj
+                                + " END"
                         }
                     })
                     .collect();

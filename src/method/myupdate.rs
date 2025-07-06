@@ -9,8 +9,9 @@
 ///     "title": "更新操作",
 ///     "content": info,
 ///     "uid": 9,
-///     "price": None,// None 或 "null" 表示更新字段值为NULL
-///     "total": Some(20),
+///     "price": "null", // 更新字段值为NULL
+///     "price2": None, // 忽略该字段
+///     "total": Some(20), // 更新为 20
 /// });
 /// my_run_drop(&mut conn, sql).unwrap();
 ///
@@ -141,11 +142,13 @@ macro_rules! myupdate {
                 let op_v_type = type_of(&temp_op);
                 let mut temp_v: String;
                 let mut v_type = "&&str";
+                let mut is_option_none = false;
                 let value;
                 if op_v_type.contains("&core::option::Option") {
                     let op_str = format!("{:?}", temp_op);
                     if op_str == "None".to_string() {
                         temp_v = "null".to_string();
+                        is_option_none = true;
                     } else {
                         let mut t = op_str.replace("Some(", "");
                         t.pop();
@@ -194,7 +197,9 @@ macro_rules! myupdate {
                     "unset" => $k.to_string() + "=NULL,",
                     _ => $k.to_string() + "=" + value.as_str(),
                 };
-                temp_s = temp_s + tmp_s.as_str();
+                if !is_option_none {
+                    temp_s = temp_s + tmp_s.as_str();
+                }
             )+
 
             temp_s.pop();
@@ -308,11 +313,13 @@ macro_rules! myupdate {
                 let op_v_type = type_of(&temp_op);
                 let mut temp_v: String;
                 let mut v_type = "&&str";
+                let mut is_option_none = false;
                 let value;
                 if op_v_type.contains("&core::option::Option") {
                     let op_str = format!("{:?}", temp_op);
                     if op_str == "None".to_string() {
                         temp_v = "null".to_string();
+                        is_option_none = true;
                     } else {
                         let mut t = op_str.replace("Some(", "");
                         t.pop();
@@ -348,7 +355,9 @@ macro_rules! myupdate {
                     };
                 }
                 let tmp_s = $k.to_string() + "=" + value.as_str();
-                temp_s = temp_s + tmp_s.as_str();
+                if !is_option_none {
+                    temp_s = temp_s + tmp_s.as_str();
+                }
             )+
 
             temp_s.pop();
@@ -461,11 +470,13 @@ macro_rules! myupdate {
                 let op_v_type = type_of(&temp_op);
                 let mut temp_v: String;
                 let mut v_type = "&&str";
+                let mut is_option_none = false;
                 let value;
                 if op_v_type.contains("&core::option::Option") {
                     let op_str = format!("{:?}", temp_op);
                     if op_str == "None".to_string() {
                         temp_v = "null".to_string();
+                        is_option_none = true;
                     } else {
                         let mut t = op_str.replace("Some(", "");
                         t.pop();
@@ -513,7 +524,9 @@ macro_rules! myupdate {
                     "unset" => $k.to_string() + "=NULL,",
                     _ => $k.to_string() + "=" + value.as_str(),
                 };
-                temp_s = temp_s + tmp_s.as_str();
+                if !is_option_none {
+                    temp_s = temp_s + tmp_s.as_str();
+                }
             )+
 
             temp_s.pop();
@@ -626,11 +639,13 @@ macro_rules! myupdate {
                 let op_v_type = type_of(&temp_op);
                 let mut temp_v: String;
                 let mut v_type = "&&str";
+                let mut is_option_none = false;
                 let value;
                 if op_v_type.contains("&core::option::Option") {
                     let op_str = format!("{:?}", temp_op);
                     if op_str == "None".to_string() {
                         temp_v = "null".to_string();
+                        is_option_none = true;
                     } else {
                         let mut t = op_str.replace("Some(", "");
                         t.pop();
@@ -666,7 +681,9 @@ macro_rules! myupdate {
                     };
                 }
                 let tmp_s = $k.to_string() + "=" + value.as_str();
-                temp_s = temp_s + tmp_s.as_str();
+                if !is_option_none {
+                    temp_s = temp_s + tmp_s.as_str();
+                }
             )+
 
             temp_s.pop();

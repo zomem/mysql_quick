@@ -14,8 +14,16 @@
 ///     price: Option<f32>,
 /// }
 /// let vec_data = vec![
-///     Item {content: info.to_owned(), total: 10, price: Some(30.5)},
-///     Item {content: String::from("批量新增"), total: 11, price: None}, // "null" 也表示 NULL
+///     Item {
+///         content: "null".to_string(), // NULL 值
+///         total: 11,
+///         price: None, // DEFAULT 值
+///     },
+///     Item {
+///         content: info.to_owned(),
+///         total: 10,
+///         price: Some(30.5), // 30.5
+///     },
 /// ];
 /// let sql = mysetmany!("for_test", vec_data);
 /// my_run_drop(&mut conn, sql).unwrap();
@@ -37,7 +45,7 @@ macro_rules! mysetmany {
                 if (temp_v.is_number()) {
                     value = value + temp_v.to_string().as_str() + ",";
                 } else if temp_v.is_null() {
-                    value = value + "NULL,";
+                    value = value + "DEFAULT,";
                 } else if temp_v.is_string() {
                     let t_v = temp_v.as_str().unwrap();
                     if t_v == "null" {

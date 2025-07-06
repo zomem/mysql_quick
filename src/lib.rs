@@ -2,13 +2,13 @@ mod method;
 pub use method::*;
 
 pub use regex::Regex;
-pub use serde_json::{from_str, to_string, Value};
+pub use serde_json::{Value, from_str, to_string};
 
 #[cfg(test)]
 mod test {
     use crate::{
-        my_run_vec, mycount, mydel, myfind, myget, myset, mysetmany, myupdate, myupdatemany,
-        MysqlQuick, MysqlQuickCount, Sql,
+        MysqlQuick, MysqlQuickCount, Sql, my_run_vec, mycount, mydel, myfind, myget, myset,
+        mysetmany, myupdate, myupdatemany,
     };
     use serde::{Deserialize, Serialize};
 
@@ -177,5 +177,100 @@ mod test {
            "cb": "null",
         });
         println!("sql,,,  {}", sql);
+    }
+
+    #[test]
+    fn test_option() {
+        let age: Option<u32> = None;
+        let sql = myset!("for_test", {
+            "name":  "wzj" ,
+            "age":  age,
+            "name2": &Some("wzj"),
+            "age2": age,
+            "content": "null"
+        });
+        println!("sql__ {}", sql);
+
+        let sql = myupdate!("for_test", {"cid": 3}, {
+            "name": ["set", "wzj"],
+            "age": ["set", age],
+            "name2":["set", &Some("wzj")],
+            "age2": ["incr", Some(32)],
+            "content": ["set", "null"]
+        });
+        println!("sql22__ {}", sql);
+
+        let sql = myupdate!("for_test", 3, {
+            "name": ["set", "wzj"],
+            "age": ["set", age],
+            "name2":["set", &Some("wzj")],
+            "age2": ["incr", Some(32)],
+            "content": ["set", "null"]
+        });
+        println!("sql22__ {}", sql);
+
+        let sql = myupdate!("for_test", {"cid": 3}, {
+            "name": "wzj",
+            "age": age,
+            "name2": &Some("wzj"),
+            "age2": Some(32),
+            "content": "null"
+        });
+        println!("sql22__ {}", sql);
+
+        let sql = myupdate!("for_test", 3, {
+            "name": "wzj",
+            "age": age,
+            "name2": &Some("wzj"),
+            "age2": Some(32),
+            "content": "null"
+        });
+        println!("sql22__ {}", sql);
+
+        #[derive(Serialize, Deserialize)]
+        struct Item {
+            content: String,
+            total: u32,
+            price: Option<f32>,
+        }
+        let vec_data = vec![
+            Item {
+                content: String::from("批量22新增"),
+                total: 10,
+                price: Some(30.5),
+            },
+            Item {
+                content: "null".to_string(),
+                total: 11,
+                price: None,
+            },
+        ];
+        let sql = mysetmany!("for_test", vec_data);
+        println!("sql__ {}", sql);
+
+        #[derive(Serialize, Deserialize)]
+        struct Item2 {
+            id: u64,
+            content: Option<String>,
+            total: u32,
+        }
+        let vec_data = vec![
+            Item2 {
+                id: 1,
+                content: Some("ABC".to_string()),
+                total: 1,
+            },
+            Item2 {
+                id: 2,
+                content: Some("null".to_string()),
+                total: 1,
+            },
+        ];
+        // 当前以 id 字段为查寻条件，更新 id 分别为7、8数据的content、total为对应的值。
+        let sql = myupdatemany!("for_test", "id,+total", vec_data);
+        println!("\nsql_aa_ {}", sql);
+
+        let sql = myupdatemany!("for_test", "id,total", vec_data);
+        println!("\nsql_bb_ {}", sql);
     }
 }

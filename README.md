@@ -1,4 +1,15 @@
 
+### 更新日志 2.0.0
+- 更新mysql版本至26
+- 新增和更新数据，如果字段为 None, 则会忽略该字段（旧版本为新增更新字段为 NULL）；如果为 Some(x)，则才会新增更新字段为x；如果想要新增更新字段为 Null, 则传入 "null"。如下：
+```rust
+// 示例，set类方法同理。
+myupdate!("for_test", 56, {
+    "content": "null", // 将更新 content 为 NULL
+    "tatol": Some(200), // 将更新 tatol 为 200
+    "uid": None, // 将忽略 uid 字段
+}
+```
 
 ### mysql 数据库连接方法封装
 ```rust
@@ -9,7 +20,6 @@ pub fn mysql_conn() -> PooledConn {
 }
 let mut conn = mysql_conn();
 ```
-
 
 ### mysql 查寻方法
 

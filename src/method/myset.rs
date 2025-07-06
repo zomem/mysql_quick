@@ -9,9 +9,10 @@
 /// let sql = myset!("for_test", {
 ///     "title": "set 新增",
 ///     "content": info,
-///     "total": None, // None 或 "null" 表示新增字段为NULL
+///     "total": "null", // 新增字段为NULL
+///     "total2": None, // 忽略该字段（默认值DEFAULT）
 ///     "uid": 8,
-///     "price": Some(88.2),
+///     "price": Some(88.2), // 将新增为88.2
 /// });
 /// let id = my_run_drop(&mut conn, sql).unwrap();
 /// # if id <= 0 {
@@ -94,17 +95,16 @@ macro_rules! myset {
             let mut keys = String::from("");
             let mut values = String::from("");
             $(
-                keys = keys + $k + ",";
-            )+
-            $(
                 let temp_op = $v;
                 let op_v_type = type_of(&temp_op);
                 let mut temp_v: String;
                 let mut v_type = "&&str";
+                let mut is_option_none = false;
                 if op_v_type.contains("&core::option::Option") {
                     let op_str = format!("{:?}", temp_op);
                     if op_str == "None".to_string() {
                         temp_v = "null".to_string();
+                        is_option_none = true;
                     } else {
                         let mut t = op_str.replace("Some(", "");
                         t.pop();
@@ -115,31 +115,34 @@ macro_rules! myset {
                     temp_v = format!("{:?}", temp_op);
                     v_type = get_v_type(op_v_type)
                 }
-                if temp_v.as_str() == "null" || temp_v.as_str() == "\"null\"" {
-                    values = values + "NULL,";
-                } else {
-                    values = match v_type {
-                        "&&str" | "&alloc::string::String" | "&&alloc::string::String" => {
-                            temp_v.remove(0);
-                            temp_v.pop();
-                            // let mut v_r = temp_v.as_str().replace("\\", "\\\\");
-                            // v_r = v_r.replace("\"", "\\\"");
-                            values + "\"" + &temp_v + "\","
-                        },
-                        "&u8" | "&u16" | "&u32" | "&u64" | "&u128" | "&usize" |
-                        "&i8" | "&i16" | "&i32" | "&i64" | "&i128" | "&isize" |
-                        "&f32" | "&f64" | "&f128" | "&bool" => {
-                            values + temp_v.as_str() + ","
-                        },
-                        "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
-                        "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
-                        "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
-                            values + temp_v.as_str() + ","
-                        },
-                        _ => {
-                           "".to_string()
-                        },
-                    };
+                if !is_option_none {
+                    if temp_v.as_str() == "null" || temp_v.as_str() == "\"null\"" {
+                        values = values + "NULL,";
+                    } else {
+                        values = match v_type {
+                            "&&str" | "&alloc::string::String" | "&&alloc::string::String" => {
+                                temp_v.remove(0);
+                                temp_v.pop();
+                                // let mut v_r = temp_v.as_str().replace("\\", "\\\\");
+                                // v_r = v_r.replace("\"", "\\\"");
+                                values + "\"" + &temp_v + "\","
+                            },
+                            "&u8" | "&u16" | "&u32" | "&u64" | "&u128" | "&usize" |
+                            "&i8" | "&i16" | "&i32" | "&i64" | "&i128" | "&isize" |
+                            "&f32" | "&f64" | "&f128" | "&bool" => {
+                                values + temp_v.as_str() + ","
+                            },
+                            "&&u8" | "&&u16" | "&&u32" | "&&u64" | "&&u128" | "&&usize" |
+                            "&&i8" | "&&i16" | "&&i32" | "&&i64" | "&&i128" | "&&isize" |
+                            "&&f32" | "&&f64" | "&&f128" | "&&bool" => {
+                                values + temp_v.as_str() + ","
+                            },
+                            _ => {
+                               "".to_string()
+                            },
+                        };
+                    }
+                    keys = keys + $k + ",";
                 }
             )+
 
