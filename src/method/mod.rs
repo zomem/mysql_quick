@@ -22,6 +22,12 @@ mod myset;
 mod mysetmany;
 
 #[macro_use]
+mod mysetupdate;
+
+#[macro_use]
+mod mysetupdatemany;
+
+#[macro_use]
 mod myupdate;
 
 #[macro_use]

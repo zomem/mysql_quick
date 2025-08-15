@@ -8,7 +8,7 @@ pub use serde_json::{Value, from_str, to_string};
 mod test {
     use crate::{
         MysqlQuick, MysqlQuickCount, Sql, my_run_vec, mycount, mydel, myfind, myget, myset,
-        mysetmany, myupdate, myupdatemany,
+        mysetmany, mysetupdate, mysetupdatemany, myupdate, myupdatemany,
     };
     use serde::{Deserialize, Serialize};
 
@@ -182,6 +182,16 @@ mod test {
     #[test]
     fn test_option() {
         let age: Option<u32> = None;
+
+        let sql = mysetupdate!("for_test", "name,age2", {
+            "name": "wzj",
+            "age": age,
+            "name2": &Some("wzj"),
+            "age2": Some(32),
+            "content": "null"
+        });
+        println!("setupd__ {}", sql);
+
         let sql = myset!("for_test", {
             "name":  "wzj" ,
             "age":  age,
@@ -246,7 +256,9 @@ mod test {
             },
         ];
         let sql = mysetmany!("for_test", vec_data);
-        println!("sql__ {}", sql);
+        println!("mysetmany__ {}", sql);
+        let sql = mysetupdatemany!("for_test", "total,price", vec_data);
+        println!("mysetupdatemany__ {}", sql);
 
         #[derive(Serialize, Deserialize)]
         struct Item2 {
